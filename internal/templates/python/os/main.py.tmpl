@@ -1,0 +1,19 @@
+import os
+import platform
+import psutil
+
+def main():
+    print("Welcome to {{ .Name }} - Operating Systems & Low-level")
+    
+    print("\n--- System Information ---")
+    print(f"OS: {platform.system()} {platform.release()}")
+    print(f"Architecture: {platform.machine()}")
+    print(f"Processor: {platform.processor()}")
+    
+    print("\n--- Current Process ---")
+    process = psutil.Process(os.getpid())
+    print(f"PID: {process.pid}")
+    print(f"Memory Use: {process.memory_info().rss / 1024 / 1024:.2f} MB")
+
+if __name__ == "__main__":
+    main()

@@ -28,8 +28,8 @@ func (p *PythonHandler) Name() string {
 // SupportedTypes declares which global taxonomy categories Python supports
 func (p *PythonHandler) SupportedTypes() []string {
 	return []string{
-		"basic", "web", "desktop", "game", "ai", "data", "db", "devops",
-		"network", "security", "finance", "comm", "script", "monitor",
+		"basic", "web", "desktop", "mobile", "game", "ai", "data", "db", "devops",
+		"network", "security", "os", "lang", "finance", "comm", "script", "monitor",
 		"stream", "science", "media", "iot", "web3", "graphics", "edu",
 	}
 }
@@ -68,6 +68,9 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 	case "web":
 		templatePath = "python/web/main.py.tmpl"
 		deps = append(deps, "fastapi", "uvicorn")
+	case "mobile":
+		templatePath = "python/mobile/main.py.tmpl"
+		deps = append(deps, "kivy")
 	case "desktop":
 		templatePath = "python/desktop/main.py.tmpl"
 		// tkinter is built-in
@@ -92,6 +95,12 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 	case "security":
 		templatePath = "python/security/main.py.tmpl"
 		deps = append(deps, "cryptography")
+	case "os":
+		templatePath = "python/os/main.py.tmpl"
+		deps = append(deps, "psutil")
+	case "lang":
+		templatePath = "python/lang/main.py.tmpl"
+		// ast is built-in
 	case "finance":
 		templatePath = "python/finance/main.py.tmpl"
 		deps = append(deps, "yfinance", "pandas")

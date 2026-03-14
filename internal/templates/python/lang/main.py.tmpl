@@ -1,0 +1,24 @@
+import ast
+
+def analyze_code(source_code):
+    try:
+        tree = ast.parse(source_code)
+        print("AST successfully generated.")
+        for node in ast.walk(tree):
+            if isinstance(node, ast.FunctionDef):
+                print(f"Found function: {node.name}")
+    except SyntaxError as e:
+        print(f"Syntax Error: {e}")
+
+def main():
+    print("Welcome to {{ .Name }} - Compilers & Languages")
+    
+    sample_code = """
+def hello_world():
+    print("Hello!")
+"""
+    print("\nAnalyzing sample Python code...")
+    analyze_code(sample_code)
+
+if __name__ == "__main__":
+    main()
