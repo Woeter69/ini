@@ -1,0 +1,29 @@
+package main
+
+import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+)
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Security & Cryptography")
+
+	// Generate a random byte slice
+	randomBytes := make([]byte, 16)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		fmt.Println("Error generating random bytes:", err)
+		return
+	}
+
+	fmt.Printf("\nGenerated Random Hex: %s\n", hex.EncodeToString(randomBytes))
+
+	// Hash the bytes using SHA256
+	message := []byte("Top Secret Data")
+	hash := sha256.Sum256(message)
+
+	fmt.Printf("Original Message: %s\n", message)
+	fmt.Printf("SHA-256 Hash: %x\n", hash)
+}

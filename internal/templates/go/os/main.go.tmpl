@@ -1,0 +1,24 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+)
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Operating Systems & Low-level")
+
+	fmt.Println("\n--- System Information ---")
+	fmt.Printf("OS: %s\n", runtime.GOOS)
+	fmt.Printf("Architecture: %s\n", runtime.GOARCH)
+	fmt.Printf("CPUs: %d\n", runtime.NumCPU())
+
+	fmt.Println("\n--- Current Process ---")
+	fmt.Printf("PID: %d\n", os.Getpid())
+	
+	dir, err := os.Getwd()
+	if err == nil {
+		fmt.Printf("Working Directory: %s\n", dir)
+	}
+}

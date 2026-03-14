@@ -1,0 +1,28 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/ethereum/go-ethereum/ethclient"
+)
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Blockchain & Web3")
+	
+	// Connect to Ethereum Mainnet (public Cloudflare gateway)
+	client, err := ethclient.Dial("https://cloudflare-eth.com")
+	if err != nil {
+		log.Fatalf("Failed to connect to the Ethereum network: %v", err)
+	}
+
+	fmt.Println("\nSuccessfully connected to Cloudflare public node!")
+	
+	header, err := client.HeaderByNumber(context.Background(), nil)
+	if err != nil {
+		log.Fatalf("Failed to retrieve latest block header: %v", err)
+	}
+
+	fmt.Printf("Current Block Number: %d\n", header.Number.Uint64())
+}

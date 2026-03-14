@@ -1,0 +1,41 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net"
+	"net/rpc"
+)
+
+type Args struct {
+	A, B int
+}
+
+type MathService int
+
+func (m *MathService) Multiply(args *Args, reply *int) error {
+	*reply = args.A * args.B
+	return nil
+}
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Communication (RPC Server)")
+	
+	service := new(MathService)
+	rpc.Register(service)
+
+	listener, err := net.Listen("tcp", ":1234")
+	if err != nil {
+		log.Fatal("Listen error:", err)
+	}
+	defer listener.Close()
+
+	fmt.Println("RPC Server listening on port 1234...")
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Fatal("Accept error:", err)
+		}
+		go rpc.ServeConn(conn)
+	}
+}

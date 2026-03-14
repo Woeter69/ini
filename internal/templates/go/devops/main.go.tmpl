@@ -1,0 +1,30 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+
+	"github.com/docker/docker/client"
+)
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - DevOps & Infrastructure")
+	
+	// Create a new Docker client
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		log.Printf("Failed to create Docker client: %v. Is Docker running?", err)
+		return
+	}
+	defer cli.Close()
+
+	// Ping the Docker daemon
+	ping, err := cli.Ping(context.Background())
+	if err != nil {
+		log.Printf("Failed to connect to Docker daemon: %v", err)
+		return
+	}
+	
+	fmt.Printf("Successfully connected to Docker Daemon! API Version: %s\n", ping.APIVersion)
+}

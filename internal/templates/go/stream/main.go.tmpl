@@ -1,0 +1,36 @@
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func producer(ch chan<- string) {
+	for i := 1; i <= 5; i++ {
+		msg := fmt.Sprintf("Message %d", i)
+		fmt.Printf("[Producer] Emitting: %s\n", msg)
+		ch <- msg
+		time.Sleep(1 * time.Second)
+	}
+	close(ch)
+}
+
+func consumer(ch <-chan string, done chan<- bool) {
+	for msg := range ch {
+		fmt.Printf("[Consumer] Processing: %s\n", msg)
+	}
+	done <- true
+}
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Messaging & Streaming")
+	
+	stream := make(chan string)
+	done := make(chan bool)
+
+	go producer(stream)
+	go consumer(stream, done)
+
+	<-done
+	fmt.Println("All messages processed.")
+}

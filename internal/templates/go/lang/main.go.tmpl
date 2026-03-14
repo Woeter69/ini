@@ -1,0 +1,38 @@
+package main
+
+import (
+	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"log"
+)
+
+func main() {
+	fmt.Println("Welcome to {{ .Name }} - Compilers & Languages")
+	
+	src := `
+package main
+
+import "fmt"
+
+func helloWorld() {
+	fmt.Println("Hello!")
+}
+`
+	fmt.Println("\nAnalyzing sample Go code...")
+	
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, "", src, 0)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ast.Inspect(node, func(n ast.Node) bool {
+		fn, ok := n.(*ast.FuncDecl)
+		if ok {
+			fmt.Printf("Found function: %s\n", fn.Name.Name)
+		}
+		return true
+	})
+}
