@@ -1,0 +1,20 @@
+import smtplib
+from email.message import EmailMessage
+
+def main():
+    print("Welcome to {{ .Name }} - Communication Application")
+    
+    msg = EmailMessage()
+    msg.set_content("This is an automated message from {{ .Name }}.")
+    msg['Subject'] = 'Hello from {{ .Name }}'
+    msg['From'] = 'system@example.com'
+    msg['To'] = 'user@example.com'
+    
+    print("\nDrafted Email:")
+    print(f"Subject: {msg['Subject']}")
+    print(f"To: {msg['To']}")
+    print("\nNote: Configure SMTP server settings to send real emails.")
+    print("Example: smtplib.SMTP('localhost') as s; s.send_message(msg)")
+
+if __name__ == "__main__":
+    main()

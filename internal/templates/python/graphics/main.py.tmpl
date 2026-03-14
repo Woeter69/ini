@@ -1,0 +1,47 @@
+import glfw
+from OpenGL.GL import *
+import sys
+
+def main():
+    print("Welcome to {{ .Name }} - AR/VR/Graphics")
+    
+    # Initialize GLFW
+    if not glfw.init():
+        print("Failed to initialize GLFW.")
+        sys.exit(1)
+
+    # Create a windowed mode window and its OpenGL context
+    window = glfw.create_window(640, 480, "{{ .Name }} - OpenGL", None, None)
+    if not window:
+        glfw.terminate()
+        sys.exit(1)
+
+    # Make the window's context current
+    glfw.make_context_current(window)
+
+    print("OpenGL Context Initialized. Running main loop...")
+    # Loop until the user closes the window
+    while not glfw.window_should_close(window):
+        
+        # Render
+        glClear(GL_COLOR_BUFFER_BIT)
+
+        # Basic Triangle
+        glBegin(GL_TRIANGLES)
+        glColor3f(1.0, 0.0, 0.0)
+        glVertex2f(-0.5, -0.5)
+        glColor3f(0.0, 1.0, 0.0)
+        glVertex2f(0.5, -0.5)
+        glColor3f(0.0, 0.0, 1.0)
+        glVertex2f(0.0, 0.5)
+        glEnd()
+
+        # Swap front and back buffers
+        glfw.swap_buffers(window)
+        # Poll for and process events
+        glfw.poll_events()
+
+    glfw.terminate()
+
+if __name__ == "__main__":
+    main()

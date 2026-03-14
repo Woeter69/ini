@@ -1,0 +1,20 @@
+from PIL import Image, ImageDraw
+
+def main():
+    print("Welcome to {{ .Name }} - Media & Content")
+    
+    print("\nGenerating a sample image...")
+    # Create a new image with a white background
+    img = Image.new('RGB', (400, 300), color='white')
+    
+    # Draw a blue rectangle
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([50, 50, 350, 250], fill='blue', outline='black', width=3)
+    
+    # Save the image
+    filename = "sample_output.png"
+    img.save(filename)
+    print(f"Image saved successfully to '{filename}'")
+
+if __name__ == "__main__":
+    main()

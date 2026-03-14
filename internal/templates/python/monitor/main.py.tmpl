@@ -1,0 +1,19 @@
+import time
+import psutil
+
+def main():
+    print("Welcome to {{ .Name }} - Observability & Monitoring")
+    
+    print("\nStarting basic system monitor (Press Ctrl+C to stop)...")
+    try:
+        while True:
+            cpu = psutil.cpu_percent(interval=1)
+            mem = psutil.virtual_memory()
+            
+            print(f"CPU Usage: {cpu}% | Memory Usage: {mem.percent}%")
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nMonitoring stopped.")
+
+if __name__ == "__main__":
+    main()

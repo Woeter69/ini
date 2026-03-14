@@ -1,0 +1,24 @@
+from cryptography.fernet import Fernet
+
+def main():
+    print("Welcome to {{ .Name }} - Security & Cryptography")
+    
+    # Generate a key
+    key = Fernet.generate_key()
+    f = Fernet(key)
+    
+    print(f"Secret Key Generated: {key.decode('utf-8')}")
+    
+    message = b"Top Secret Data!"
+    print(f"\nOriginal Message: {message.decode('utf-8')}")
+    
+    # Encrypt
+    token = f.encrypt(message)
+    print(f"Encrypted Token:  {token}")
+    
+    # Decrypt
+    decrypted = f.decrypt(token)
+    print(f"Decrypted Data:   {decrypted.decode('utf-8')}")
+
+if __name__ == "__main__":
+    main()

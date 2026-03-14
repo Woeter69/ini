@@ -1,0 +1,24 @@
+import time
+import random
+
+def read_sensor():
+    # Simulate reading from a DHT22 or an MPU6050
+    return {
+        "temperature": round(random.uniform(20.0, 35.0), 2),
+        "humidity": round(random.uniform(40.0, 80.0), 2)
+    }
+
+def main():
+    print("Welcome to {{ .Name }} - IoT & Hardware")
+    print("Initializing virtual sensors...\n")
+    
+    try:
+        while True:
+            data = read_sensor()
+            print(f"[Sensor Read] Temp: {data['temperature']}°C | Humidity: {data['humidity']}%")
+            time.sleep(2)
+    except KeyboardInterrupt:
+        print("\nHardware disconnected.")
+
+if __name__ == "__main__":
+    main()

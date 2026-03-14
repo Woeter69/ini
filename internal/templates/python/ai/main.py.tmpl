@@ -1,0 +1,27 @@
+import torch
+import torch.nn as nn
+
+class SimpleModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(10, 1)
+
+    def forward(self, x):
+        return self.linear(x)
+
+def main():
+    print("Welcome to {{ .Name }} - AI & Machine Learning")
+    
+    # Initialize basic PyTorch model
+    model = SimpleModel()
+    print("\nModel Architecture:")
+    print(model)
+
+    # Test inference
+    dummy_input = torch.randn(1, 10)
+    output = model(dummy_input)
+    print(f"\nDummy Input Shape: {dummy_input.shape}")
+    print(f"Output: {output.item():.4f}")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,29 @@
+import sqlalchemy as sa
+from sqlalchemy.orm import declarative_base, Session
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = 'users'
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String)
+
+def main():
+    print("Welcome to {{ .Name }} - Database & Storage")
+    
+    # Create in-memory SQLite database
+    engine = sa.create_engine("sqlite:///:memory:", echo=False)
+    Base.metadata.create_all(engine)
+    
+    with Session(engine) as session:
+        # Insert
+        user = User(name="Test User")
+        session.add(user)
+        session.commit()
+        
+        # Query
+        queried = session.query(User).first()
+        print(f"Successfully connected and inserted user: {queried.name}")
+
+if __name__ == "__main__":
+    main()

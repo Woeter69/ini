@@ -1,0 +1,22 @@
+import yfinance as yf
+
+def main():
+    print("Welcome to {{ .Name }} - Finance & Trading")
+    
+    ticker = "AAPL"
+    print(f"\nFetching data for {ticker} using yfinance...")
+    
+    try:
+        stock = yf.Ticker(ticker)
+        
+        # Get historical market data
+        hist = stock.history(period="5d")
+        
+        print(f"\nLast 5 Days of {ticker}:")
+        print(hist[['Close', 'Volume']])
+        
+    except Exception as e:
+        print(f"Failed to retrieve financial data: {e}")
+
+if __name__ == "__main__":
+    main()

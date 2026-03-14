@@ -27,7 +27,11 @@ func (p *PythonHandler) Name() string {
 
 // SupportedTypes declares which global taxonomy categories Python supports
 func (p *PythonHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "data", "game", "script"}
+	return []string{
+		"basic", "web", "desktop", "game", "ai", "data", "db", "devops",
+		"network", "security", "finance", "comm", "script", "monitor",
+		"stream", "science", "media", "iot", "web3", "graphics", "edu",
+	}
 }
 
 func (p *PythonHandler) Validate() error {
@@ -64,12 +68,59 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 	case "web":
 		templatePath = "python/web/main.py.tmpl"
 		deps = append(deps, "fastapi", "uvicorn")
-	case "data":
-		templatePath = "python/data/main.py.tmpl"
-		deps = append(deps, "pandas", "numpy")
+	case "desktop":
+		templatePath = "python/desktop/main.py.tmpl"
+		// tkinter is built-in
 	case "game":
 		templatePath = "python/game/main.py.tmpl"
 		deps = append(deps, "pygame")
+	case "ai":
+		templatePath = "python/ai/main.py.tmpl"
+		deps = append(deps, "torch")
+	case "data":
+		templatePath = "python/data/main.py.tmpl"
+		deps = append(deps, "pandas", "numpy")
+	case "db":
+		templatePath = "python/db/main.py.tmpl"
+		deps = append(deps, "sqlalchemy")
+	case "devops":
+		templatePath = "python/devops/main.py.tmpl"
+		deps = append(deps, "boto3")
+	case "network":
+		templatePath = "python/network/main.py.tmpl"
+		// socket is built-in
+	case "security":
+		templatePath = "python/security/main.py.tmpl"
+		deps = append(deps, "cryptography")
+	case "finance":
+		templatePath = "python/finance/main.py.tmpl"
+		deps = append(deps, "yfinance", "pandas")
+	case "comm":
+		templatePath = "python/comm/main.py.tmpl"
+		// smtplib is built-in
+	case "monitor":
+		templatePath = "python/monitor/main.py.tmpl"
+		deps = append(deps, "psutil")
+	case "stream":
+		templatePath = "python/stream/main.py.tmpl"
+		// queue/threading is built-in
+	case "science":
+		templatePath = "python/science/main.py.tmpl"
+		deps = append(deps, "numpy", "scipy")
+	case "media":
+		templatePath = "python/media/main.py.tmpl"
+		deps = append(deps, "pillow")
+	case "iot":
+		templatePath = "python/iot/main.py.tmpl"
+		// random/time built-in
+	case "web3":
+		templatePath = "python/web3/main.py.tmpl"
+		deps = append(deps, "web3")
+	case "graphics":
+		templatePath = "python/graphics/main.py.tmpl"
+		deps = append(deps, "PyOpenGL", "glfw")
+	case "edu":
+		templatePath = "python/edu/main.py.tmpl"
 	case "script", "basic":
 		templatePath = "python/script/main.py.tmpl"
 	}

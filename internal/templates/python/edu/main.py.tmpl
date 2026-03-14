@@ -1,0 +1,13 @@
+def main():
+    print("Welcome to {{ .Name }} - Education & Productivity")
+    
+    print("\n--- Productivity Tasks ---")
+    tasks = ["Learn Python internals", "Build an EdTech app", "Deploy to production"]
+    
+    for i, task in enumerate(tasks, 1):
+        print(f"{i}. [ ] {task}")
+
+    print("\nEducational App Bootstrapped successfully.")
+
+if __name__ == "__main__":
+    main()

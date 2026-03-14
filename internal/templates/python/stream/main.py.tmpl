@@ -1,0 +1,35 @@
+import queue
+import threading
+import time
+
+def producer(q):
+    for i in range(5):
+        msg = f"Message {i}"
+        print(f"[Producer] Emitting: {msg}")
+        q.put(msg)
+        time.sleep(1)
+
+def consumer(q):
+    while True:
+        msg = q.get()
+        print(f"[Consumer] Processing: {msg}")
+        q.task_done()
+
+def main():
+    print("Welcome to {{ .Name }} - Messaging & Streaming")
+    
+    # Simple thread-safe queue simulation
+    q = queue.Queue()
+    
+    t1 = threading.Thread(target=producer, args=(q,))
+    t2 = threading.Thread(target=consumer, args=(q,), daemon=True)
+    
+    t1.start()
+    t2.start()
+    
+    t1.join()
+    q.join()
+    print("All messages processed.")
+
+if __name__ == "__main__":
+    main()
