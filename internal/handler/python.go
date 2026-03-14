@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -20,6 +23,11 @@ type PythonHandler struct{}
 
 func (p *PythonHandler) Name() string {
 	return "Python"
+}
+
+// SupportedTypes declares which global taxonomy categories Python supports
+func (p *PythonHandler) SupportedTypes() []string {
+	return []string{"basic", "web", "data", "game", "script"}
 }
 
 func (p *PythonHandler) Validate() error {
@@ -38,55 +46,77 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// 2. Create virtual environment with uv
-	fmt.Printf("  %s Creating virtual environment with uv...\n", ui.Arrow)
-	uvVenv := exec.Command("uv", "venv")
-	uvVenv.Dir = projectDir
-	uvVenv.Stdout = os.Stdout
-	uvVenv.Stderr = os.Stderr
-	if err := uvVenv.Run(); err != nil {
-		return fmt.Errorf("failed to create venv: %w", err)
+	// 2. Initialize uv project (uv init sets up pyproject.toml cleanly)
+	fmt.Printf("  %s Initializing Python project with uv...\n", ui.Arrow)
+	uvInit := exec.Command("uv", "init", "--app")
+	uvInit.Dir = projectDir
+	if err := uvInit.Run(); err != nil {
+		return fmt.Errorf("failed to init uv project: %w", err)
 	}
-	fmt.Printf("  %s Virtual environment created\n", ui.CheckMark)
+	fmt.Printf("  %s uv project initialized\n", ui.CheckMark)
 
-	// 3. Create requirements.txt
-	fmt.Printf("  %s Creating requirements.txt...\n", ui.Arrow)
-	reqContent := "# Add your project dependencies here\n# Example:\n# requests>=2.31.0\n# flask>=3.0.0\n"
-	if err := os.WriteFile(filepath.Join(projectDir, "requirements.txt"), []byte(reqContent), 0o644); err != nil {
-		return fmt.Errorf("failed to create requirements.txt: %w", err)
+	// Determine type path for template
+	templatePath := "python/script/main.py.tmpl" // fallback
+	deps := []string{}
+	cmdStr := "uv run python main.py"
+
+	switch config.Type {
+	case "web":
+		templatePath = "python/web/main.py.tmpl"
+		deps = append(deps, "fastapi", "uvicorn")
+	case "data":
+		templatePath = "python/data/main.py.tmpl"
+		deps = append(deps, "pandas", "numpy")
+	case "game":
+		templatePath = "python/game/main.py.tmpl"
+		deps = append(deps, "pygame")
+	case "script", "basic":
+		templatePath = "python/script/main.py.tmpl"
 	}
-	fmt.Printf("  %s requirements.txt created\n", ui.CheckMark)
 
-	// 4. Create .gitignore (shared)
-	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
-		return fmt.Errorf("failed to create .gitignore: %w", err)
+	// 3. Add dependencies if any
+	if len(deps) > 0 {
+		fmt.Printf("  %s Adding dependencies: %s...\n", ui.Arrow, strings.Join(deps, ", "))
+		uvAdd := exec.Command("uv", append([]string{"add"}, deps...)...)
+		uvAdd.Dir = projectDir
+		if err := uvAdd.Run(); err != nil {
+			return fmt.Errorf("failed to add dependencies: %w", err)
+		}
+		fmt.Printf("  %s Dependencies added\n", ui.CheckMark)
 	}
 
-	// 5. Create main.py
-	fmt.Printf("  %s Creating main.py...\n", ui.Arrow)
-	mainPy := fmt.Sprintf(`"""
-%s — A Python project.
-"""
+	// 4. Create main.py from embedded template
+	tmplContent, err := templates.FS.ReadFile(templatePath)
+	if err != nil {
+		return fmt.Errorf("failed to read template: %w", err)
+	}
 
+	t, err := template.New("main").Parse(string(tmplContent))
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
+	}
 
-def main():
-    print("Hello from %s!")
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, config); err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
 
-
-if __name__ == "__main__":
-    main()
-`, config.Name, config.Name)
-	if err := os.WriteFile(filepath.Join(projectDir, "main.py"), []byte(mainPy), 0o644); err != nil {
-		return fmt.Errorf("failed to create main.py: %w", err)
+	// overwrite the generated hello.py from uv init
+	os.Remove(filepath.Join(projectDir, "hello.py"))
+	if err := os.WriteFile(filepath.Join(projectDir, "main.py"), buf.Bytes(), 0o644); err != nil {
+		return fmt.Errorf("failed to write main.py: %w", err)
 	}
 	fmt.Printf("  %s main.py created\n", ui.CheckMark)
 
-	// 6. Create README.md (shared)
+	// 5. Create .gitignore and README
+	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
+		return err
+	}
 	if err := scaffold.WriteReadme(projectDir, config.Name, config.Language); err != nil {
-		return fmt.Errorf("failed to create README.md: %w", err)
+		return err
 	}
 
-	// 7. Initialize git repo (if --git flag is set)
+	// 6. Git
 	if config.Git {
 		if err := scaffold.InitGit(projectDir); err != nil {
 			return err
@@ -101,11 +131,10 @@ if __name__ == "__main__":
 	}
 
 	summary := strings.Builder{}
-	summary.WriteString(ui.SuccessStyle.Render("🚀 Your Python project is ready!"))
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your Python %s project is ready!", config.Type)))
 	summary.WriteString("\n\n")
 	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
-	summary.WriteString("  source .venv/bin/activate\n")
-	summary.WriteString("  python main.py\n")
+	summary.WriteString(fmt.Sprintf("  %s\n", cmdStr))
 
 	fmt.Println(ui.SummaryBox.Render(summary.String()))
 	fmt.Println()

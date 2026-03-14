@@ -7,6 +7,7 @@ type ProjectConfig struct {
 	Name     string
 	Path     string // Resolved absolute path where project will be created
 	Language string // Language key (e.g. "python", "node")
+	Type     string // Type of project from global taxonomy (e.g. "web", "game"). Default "basic"
 	Git      bool   // Whether to initialize a git repo
 }
 
@@ -20,6 +21,12 @@ type Handler interface {
 
 	// Init creates the project with the given config.
 	Init(config ProjectConfig) error
+}
+
+// TypedHandler is an optional interface for handlers that support specific project types.
+// If a handler doesn't implement this, it implicitly only supports the "basic" type.
+type TypedHandler interface {
+	SupportedTypes() []string
 }
 
 // registry stores all registered handlers
