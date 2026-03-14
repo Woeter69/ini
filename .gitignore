@@ -1,0 +1,10 @@
+ini
+/ini
+/tmp/
+*.exe
+*.o
+*.a
+*.out
+*.dylib
+*.so
+.DS_Store
