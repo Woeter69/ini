@@ -28,6 +28,8 @@ type langCmdConfig struct {
 func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 	var gitFlag bool
 	var typeFlag string
+	var frameworkFlag string
+	var variantFlag string
 
 	cmd := &cobra.Command{
 		Use:     cfg.Use + " [project-name]",
@@ -110,14 +112,14 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 					for _, st := range supported {
 						options = append(options, huh.NewOption[string](taxonomy.GetName(st), st))
 					}
-					
+
 					typeGrp := huh.NewGroup(
 						huh.NewSelect[string]().
 							Title(fmt.Sprintf("What kind of %s project are you building?", cfg.DisplayName)).
 							Options(options...).
 							Value(&typeFlag),
 					)
-					
+
 					if err := huh.NewForm(typeGrp).Run(); err != nil {
 						fmt.Fprintln(os.Stderr, ui.ErrorStyle.Render("Cancelled."))
 						os.Exit(1)
@@ -125,6 +127,67 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 				} else {
 					// Fallback implicitly
 					typeFlag = "basic"
+				}
+			}
+
+			// Special case for JS/TS Web Frameworks - Multi-stage Picker
+			isJS := cfg.Lang == "bun" || cfg.Lang == "js" || cfg.Lang == "ts" || cfg.Lang == "node"
+			var category string
+			if isJS && typeFlag == "web" && frameworkFlag == "" {
+				// 1. Language Variant
+				if variantFlag == "" {
+					langGrp := huh.NewGroup(
+						huh.NewSelect[string]().
+							Title("Choose Language").
+							Options(
+								huh.NewOption("TypeScript (TSX)", "ts"),
+								huh.NewOption("JavaScript (JSX)", "js"),
+							).
+							Value(&variantFlag),
+					)
+					if err := huh.NewForm(langGrp).Run(); err != nil {
+						fmt.Fprintln(os.Stderr, ui.ErrorStyle.Render("Cancelled."))
+						os.Exit(1)
+					}
+				}
+
+				// 2. Category
+				catGrp := huh.NewGroup(
+					huh.NewSelect[string]().
+						Title("Frontend or Backend?").
+						Options(
+							huh.NewOption("Frontend (Next, React, Vue, etc.)", "frontend"),
+							huh.NewOption("Backend (Express.js)", "backend"),
+						).
+						Value(&category),
+				)
+				if err := huh.NewForm(catGrp).Run(); err != nil {
+					fmt.Fprintln(os.Stderr, ui.ErrorStyle.Render("Cancelled."))
+					os.Exit(1)
+				}
+
+				// 3. Framework
+				if category == "backend" {
+					frameworkFlag = "express"
+				} else {
+					fwGrp := huh.NewGroup(
+						huh.NewSelect[string]().
+							Title("Which Framework/Library?").
+							Options(
+								huh.NewOption("Next.js (Recommended)", "next"),
+								huh.NewOption("React", "react"),
+								huh.NewOption("Vue.js", "vue"),
+								huh.NewOption("Svelte", "svelte"),
+								huh.NewOption("Solid", "solid"),
+								huh.NewOption("Angular", "angular"),
+								huh.NewOption("Vanilla (HTML/CSS)", "vanilla"),
+							).
+							Value(&frameworkFlag),
+					)
+					if err := huh.NewForm(fwGrp).Run(); err != nil {
+						fmt.Fprintln(os.Stderr, ui.ErrorStyle.Render("Cancelled."))
+						os.Exit(1)
+					}
 				}
 			}
 
@@ -149,11 +212,13 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 				ui.TitleStyle.Render(fmt.Sprintf("%q", projectName)))
 
 			config := handler.ProjectConfig{
-				Name:     projectName,
-				Path:     projectPath,
-				Language: cfg.Lang,
-				Type:     typeFlag,
-				Git:      gitFlag,
+				Name:      projectName,
+				Path:      projectPath,
+				Language:  cfg.Lang,
+				Type:      typeFlag,
+				Framework: frameworkFlag,
+				Variant:   variantFlag,
+				Git:       gitFlag,
 			}
 
 			if err := h.Init(config); err != nil {
@@ -165,5 +230,7 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 
 	cmd.Flags().BoolVar(&gitFlag, "git", false, "Initialize a git repository with 'main' branch")
 	cmd.Flags().StringVarP(&typeFlag, "type", "t", "", "Type of project to scaffold (e.g. web, game, ai)")
+	cmd.Flags().StringVarP(&frameworkFlag, "framework", "f", "", "Sub-framework for JS/TS projects (e.g. react, next, express)")
+	cmd.Flags().StringVarP(&variantFlag, "variant", "v", "", "Language variant for JS/TS projects (js or ts)")
 	return cmd
 }

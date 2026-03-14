@@ -1,12 +1,16 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -15,6 +19,11 @@ func init() { Register("bun", &BunHandler{}) }
 type BunHandler struct{}
 
 func (b *BunHandler) Name() string { return "JavaScript/TypeScript (Bun)" }
+
+func (b *BunHandler) SupportedTypes() []string {
+	return []string{"basic", "web", "script", "os", "network", "db"}
+}
+
 func (b *BunHandler) Validate() error {
 	if _, err := exec.LookPath("bun"); err != nil {
 		return fmt.Errorf("bun is not installed or not in PATH.\n  Install it: curl -fsSL https://bun.sh/install | bash")
@@ -23,13 +32,28 @@ func (b *BunHandler) Validate() error {
 }
 
 func (b *BunHandler) Init(config ProjectConfig) error {
-	if err := scaffold.CreateDir(config.Path); err != nil {
+	projectDir := config.Path
+	if err := scaffold.CreateDir(projectDir); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
+	// Handle Web Frameworks specially
+	if config.Type == "web" && config.Framework != "" {
+		return b.scaffoldWeb(config)
+	}
+
+	// Handle other custom templates
+	if config.Type != "basic" && config.Type != "" {
+		templateDir := filepath.Join("bun", config.Type)
+		if _, err := templates.FS.ReadDir(templateDir); err == nil {
+			return b.scaffoldTemplate(config, templateDir)
+		}
+	}
+
+	// Default Bun Init
 	fmt.Printf("  %s Initializing Bun project...\n", ui.Arrow)
-	bunInit := exec.Command("bun", "init", "-y") // -y bypasses prompts
-	bunInit.Dir = config.Path
+	bunInit := exec.Command("bun", "init", "-y")
+	bunInit.Dir = projectDir
 	bunInit.Stdout = nil
 	bunInit.Stderr = os.Stderr
 	if err := bunInit.Run(); err != nil {
@@ -37,24 +61,215 @@ func (b *BunHandler) Init(config ProjectConfig) error {
 	}
 	fmt.Printf("  %s bun project initialized\n", ui.CheckMark)
 
-	if err := scaffold.WriteGitignore(config.Path, config.Language); err != nil { return err }
-	if err := scaffold.WriteReadme(config.Path, config.Name, config.Language); err != nil { return err }
-	
-	// Bun init might create git, but let's control it depending on the flag
-	if config.Git {
-		// we can just re-init to be safe, or leave it. Scaffold InitGit handles it gracefully
-		if err := scaffold.InitGit(config.Path); err != nil { return err }
-	} else {
-		os.RemoveAll(config.Path + "/.git")
+	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
+		return err
+	}
+	if err := scaffold.WriteReadme(projectDir, config.Name, config.Language); err != nil {
+		return err
 	}
 
+	if config.Git {
+		if err := scaffold.InitGit(projectDir); err != nil {
+			return err
+		}
+	} else {
+		os.RemoveAll(filepath.Join(projectDir, ".git"))
+	}
+
+	b.printSummary(config)
+	return nil
+}
+
+func (b *BunHandler) scaffoldWeb(config ProjectConfig) error {
+	fmt.Printf("  %s Scaffolding %s (%s) project...\n", ui.Arrow, config.Framework, config.Variant)
+
+	switch config.Framework {
+	case "next":
+		nextArgs := []string{"x", "create-next-app@latest", ".", "--tailwind", "--eslint", "--app", "--src-dir", "--use-bun", "--no-git"}
+		if config.Variant == "ts" {
+			nextArgs = append(nextArgs, "--ts")
+		} else {
+			nextArgs = append(nextArgs, "--js")
+		}
+		cmd := exec.Command("bun", nextArgs...)
+		cmd.Dir = config.Path
+		cmd.Stdin = strings.NewReader("y\n")
+		return cmd.Run()
+	case "react":
+		tDir := "bun/react-jsx"
+		if config.Variant == "ts" {
+			tDir = "bun/react-tsx"
+		}
+		if err := b.scaffoldTemplate(config, tDir); err != nil {
+			return err
+		}
+		fmt.Printf("  %s Installing dependencies...\n", ui.Arrow)
+		return exec.Command("bun", "install").Run()
+	case "vue":
+		tDir := "bun/vue-js"
+		if config.Variant == "ts" {
+			tDir = "bun/vue-ts"
+		}
+		if err := b.scaffoldTemplate(config, tDir); err != nil {
+			return err
+		}
+		fmt.Printf("  %s Installing dependencies...\n", ui.Arrow)
+		return exec.Command("bun", "install").Run()
+	case "svelte":
+		tDir := "bun/svelte-js"
+		if config.Variant == "ts" {
+			tDir = "bun/svelte-ts"
+		}
+		if err := b.scaffoldTemplate(config, tDir); err != nil {
+			return err
+		}
+		fmt.Printf("  %s Installing dependencies...\n", ui.Arrow)
+		if err := exec.Command("bun", "install").Run(); err != nil {
+			return err
+		}
+	case "solid":
+		tDir := "bun/solid-jsx"
+		if config.Variant == "ts" {
+			tDir = "bun/solid-tsx"
+		}
+		if err := b.scaffoldTemplate(config, tDir); err != nil {
+			return err
+		}
+		fmt.Printf("  %s Installing dependencies...\n", ui.Arrow)
+		if err := exec.Command("bun", "install").Run(); err != nil {
+			return err
+		}
+	case "angular":
+		// Angular CLI is TS by default
+		fmt.Printf("  %s Using external Angular CLI (Angular requires many auxiliary tools)...\n", ui.Arrow)
+		cmd := exec.Command("bun", "x", "@angular/cli", "new", config.Name, "--directory", ".", "--skip-git")
+		cmd.Dir = config.Path
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	case "express":
+		if err := b.scaffoldTemplate(config, "bun/express"); err != nil {
+			return err
+		}
+		exec.Command("bun", "init", "-y").Run()
+		fmt.Printf("  %s Adding express...\n", ui.Arrow)
+		cmd := exec.Command("bun", "add", "express")
+		cmd.Dir = config.Path
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	case "vanilla":
+		tDir := "bun/vanilla-js"
+		if config.Variant == "ts" {
+			tDir = "bun/vanilla-ts"
+		}
+		if err := b.scaffoldTemplate(config, tDir); err != nil {
+			return err
+		}
+	}
+
+	b.printSummary(config)
+	return nil
+}
+
+func (b *BunHandler) scaffoldTemplate(config ProjectConfig, templateDir string) error {
+	entries, err := templates.FS.ReadDir(templateDir)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		subPath := filepath.Join(templateDir, entry.Name())
+		if entry.IsDir() {
+			if err := os.MkdirAll(filepath.Join(config.Path, entry.Name()), 0755); err != nil {
+				return err
+			}
+			if err := b.copyRecursive(config, subPath, entry.Name()); err != nil {
+				return err
+			}
+			continue
+		}
+
+		if err := b.processFile(config, subPath, entry.Name()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (b *BunHandler) copyRecursive(config ProjectConfig, srcDir, destPrefix string) error {
+	entries, err := templates.FS.ReadDir(srcDir)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		srcPath := filepath.Join(srcDir, entry.Name())
+		destPath := filepath.Join(destPrefix, entry.Name())
+		if entry.IsDir() {
+			if err := os.MkdirAll(filepath.Join(config.Path, destPath), 0755); err != nil {
+				return err
+			}
+			if err := b.copyRecursive(config, srcPath, destPath); err != nil {
+				return err
+			}
+		} else {
+			if err := b.processFile(config, srcPath, destPath); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (b *BunHandler) printSummary(config ProjectConfig) error {
 	fmt.Println()
 	s := strings.Builder{}
-	s.WriteString(ui.SuccessStyle.Render("🚀 Your JavaScript/TypeScript project is ready!"))
+	title := "JavaScript/TypeScript"
+	if config.Framework != "" {
+		title = config.Framework
+	}
+	s.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your %s project is ready!", title)))
 	s.WriteString("\n\n")
 	s.WriteString(fmt.Sprintf("  cd %s\n", config.Name))
-	s.WriteString("  bun run index.ts\n")
+	
+	switch config.Framework {
+	case "next", "react-js", "react-ts", "vue":
+		s.WriteString("  bun run dev\n")
+	case "express":
+		s.WriteString("  bun run src/index.js\n")
+	case "vanilla-js", "vanilla-ts":
+		s.WriteString("  # Open index.html in your browser\n")
+	default:
+		s.WriteString("  bun run index.ts\n")
+	}
+	
 	fmt.Println(ui.SummaryBox.Render(s.String()))
 	fmt.Println()
 	return nil
 }
+
+func (b *BunHandler) processFile(config ProjectConfig, srcPath, destRelPath string) error {
+	content, err := templates.FS.ReadFile(srcPath)
+	if err != nil {
+		return err
+	}
+
+	targetName := strings.TrimSuffix(destRelPath, ".tmpl")
+
+	// Execute template if it has .tmpl extension (either in source or dest)
+	if strings.HasSuffix(srcPath, ".tmpl") || strings.HasSuffix(destRelPath, ".tmpl") {
+		t, err := template.New(filepath.Base(srcPath)).Parse(string(content))
+		if err != nil {
+			return err
+		}
+		var buf bytes.Buffer
+		if err := t.Execute(&buf, config); err != nil {
+			return err
+		}
+		content = buf.Bytes()
+	}
+
+	return os.WriteFile(filepath.Join(config.Path, targetName), content, 0644)
+}
+

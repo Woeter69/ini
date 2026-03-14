@@ -1,0 +1,18 @@
+use ethers::prelude::*;
+use std::convert::TryFrom;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("Welcome to {{ .Name }} - Blockchain & Web3");
+
+    // Connect to Ethereum public node via Cloudflare
+    let provider = Provider::<Http>::try_from("https://cloudflare-eth.com")?;
+    
+    println!("\nConnecting to Ethereum Mainnet...");
+    let block_number = provider.get_block_number().await?;
+    
+    println!("Successfully connected!");
+    println!("Current Block Number: {}", block_number);
+
+    Ok(())
+}

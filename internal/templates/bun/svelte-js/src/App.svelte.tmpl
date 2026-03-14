@@ -1,0 +1,29 @@
+<script>
+  let count = 0
+  const increment = () => {
+    count += 1
+  }
+</script>
+
+<main>
+  <h1>{{ .Name }}</h1>
+
+  <div class="card">
+    <button on:click={increment}>
+      count is {count}
+    </button>
+    <p>
+      Edit <code>src/App.svelte</code> and save to test HMR
+    </p>
+  </div>
+
+  <p class="read-the-docs">
+    Built with Bun + Svelte + JS + Vite
+  </p>
+</main>
+
+<style>
+  .read-the-docs {
+    color: #888;
+  }
+</style>

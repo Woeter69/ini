@@ -1,0 +1,28 @@
+use syn::{Item, ItemFn};
+use quote::quote;
+
+fn main() {
+    println!("Welcome to {{ .Name }} - Compilers & Languages");
+
+    let source_code = r#"
+        fn hello_world() {
+            println!("Hello from the parsed AST!");
+        }
+    "#;
+
+    println!("\nParsing Rust Source Code:\n{}", source_code);
+
+    // Parse the input rust code
+    let syntax_tree: syn::File = syn::parse_str(source_code).expect("Unable to parse code");
+
+    // Search the tree for function declarations
+    for item in syntax_tree.items {
+        if let Item::Fn(ItemFn { sig, block, .. }) = item {
+            println!("Found Function Name: {}", sig.ident);
+            
+            // Re-generate code from the AST nodes
+            let function_body_tokens = quote!(#block);
+            println!("Function Body AST Tokens: {}", function_body_tokens);
+        }
+    }
+}

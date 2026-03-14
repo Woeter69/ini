@@ -7,8 +7,10 @@ type ProjectConfig struct {
 	Name     string
 	Path     string // Resolved absolute path where project will be created
 	Language string // Language key (e.g. "python", "node")
-	Type     string // Type of project from global taxonomy (e.g. "web", "game"). Default "basic"
-	Git      bool   // Whether to initialize a git repo
+	Type      string // Type of project from global taxonomy (e.g. "web", "game"). Default "basic"
+	Framework string // Sub-framework selection (especially for JS/TS web)
+	Variant   string // Language variant (e.g. "js", "ts", "tsx", "jsx")
+	Git       bool   // Whether to initialize a git repo
 }
 
 // Handler is the interface that all language handlers must implement.

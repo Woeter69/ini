@@ -1,0 +1,36 @@
+use rusqlite::{Connection, Result};
+
+#[derive(Debug)]
+struct Person {
+    id: i32,
+    name: String,
+}
+
+fn main() -> Result<()> {
+    println!("Welcome to {{ .Name }} - Databases & Storage");
+
+    let conn = Connection::open_in_memory()?;
+    println!("Successfully connected to in-memory SQLite database.");
+
+    conn.execute(
+        "CREATE TABLE person (
+            id   INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        )",
+        (), // empty list of parameters
+    )?;
+    println!("Created table 'person'.");
+
+    let me = Person {
+        id: 1,
+        name: "{{ .Name }} Developer".to_string(),
+    };
+
+    conn.execute(
+        "INSERT INTO person (name) VALUES (?1)",
+        (&me.name,),
+    )?;
+    println!("Inserted record: {:?}", me);
+
+    Ok(())
+}

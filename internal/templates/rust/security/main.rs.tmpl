@@ -1,0 +1,20 @@
+use sha2::{Sha256, Digest};
+use rand::RngCore;
+
+fn main() {
+    println!("Welcome to {{ .Name }} - Security & Cryptography");
+
+    // Random bytes generation
+    let mut key = [0u8; 16];
+    rand::thread_rng().fill_bytes(&mut key);
+    println!("\nGenerated Random 16-Byte Key: {:?}", key);
+
+    // SHA-256 Hashing
+    let data = b"Top Secret Application Data";
+    let mut hasher = Sha256::new();
+    hasher.update(data);
+    let result = hasher.finalize();
+
+    println!("Original Message: {:?}", std::str::from_utf8(data).unwrap());
+    println!("SHA-256 Hash: {:x}", result);
+}

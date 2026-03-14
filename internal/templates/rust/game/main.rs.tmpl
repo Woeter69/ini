@@ -1,0 +1,24 @@
+use bevy::prelude::*;
+
+fn main() {
+    println!("Welcome to {{ .Name }} - Game Development");
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, setup)
+        .run();
+}
+
+fn setup(mut commands: Commands) {
+    // 2D Camera
+    commands.spawn(Camera2dBundle::default());
+    
+    // Welcome Text
+    commands.spawn(TextBundle::from_section(
+        "Hello from {{ .Name }}!",
+        TextStyle {
+            font_size: 60.0,
+            color: Color::WHITE,
+            ..default()
+        },
+    ));
+}

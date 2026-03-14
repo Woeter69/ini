@@ -1,0 +1,15 @@
+console.log("Welcome to {{ .Name }} - Bun Networking");
+
+const port = 3000;
+
+Bun.serve({
+  port,
+  fetch(req) {
+    const url = new URL(req.url);
+    if (url.pathname === "/") return new Response("Welcome to {{ .Name }} Network Server!");
+    if (url.pathname === "/echo") return new Response(`Echo: ${url.searchParams.get("msg") || "nothing"}`);
+    return new Response("Not Found", { status: 404 });
+  },
+});
+
+console.log(`Bun server running at http://localhost:${port}`);

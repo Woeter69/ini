@@ -1,0 +1,27 @@
+use sysinfo::{System, SystemExt, ProcessExt};
+
+fn main() {
+    println!("Welcome to {{ .Name }} - Operating Systems & Low-level");
+
+    let mut sys = System::new_all();
+    sys.refresh_all();
+
+    println!("\n--- System Information ---");
+    println!("System name:       {:?}", sys.name().unwrap_or_default());
+    println!("System kernel:     {:?}", sys.kernel_version().unwrap_or_default());
+    println!("System OS version: {:?}", sys.os_version().unwrap_or_default());
+    println!("Host name:         {:?}", sys.host_name().unwrap_or_default());
+
+    println!("\n--- Memory ---");
+    println!("Total memory: {} bytes", sys.total_memory());
+    println!("Used memory : {} bytes", sys.used_memory());
+
+    println!("\n--- Process Explorer ---");
+    println!("Top 3 Running Processes:");
+    let mut processes: Vec<_> = sys.processes().values().collect();
+    processes.sort_by(|a, b| b.memory().cmp(&a.memory()));
+
+    for process in processes.iter().take(3) {
+        println!("[{}] {} ({} RAM)", process.pid(), process.name(), process.memory());
+    }
+}

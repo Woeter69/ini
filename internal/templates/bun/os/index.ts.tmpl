@@ -1,0 +1,14 @@
+console.log("Welcome to {{ .Name }} - Bun OS & Low-level");
+
+console.log("\n--- System Information ---");
+console.log(`Platform: ${process.platform}`);
+console.log(`Architecture: ${process.arch}`);
+console.log(`CPU Cores: ${os.cpus().length}`);
+console.log(`Uptime: ${Math.floor(process.uptime())}s`);
+
+console.log("\n--- Bun Version ---");
+console.log(`Bun Version: ${Bun.version}`);
+
+import os from "node:os";
+console.log(`\nFree Memory: ${Math.round(os.freemem() / 1024 / 1024)} MB`);
+console.log(`Total Memory: ${Math.round(os.totalmem() / 1024 / 1024)} MB`);

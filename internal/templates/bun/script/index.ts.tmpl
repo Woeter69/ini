@@ -1,0 +1,8 @@
+console.log("Welcome to {{ .Name }} - Bun CLI Script");
+
+const args = Bun.argv.slice(2);
+if (args.length > 0) {
+    console.log(`Arguments received: ${args.join(", ")}`);
+} else {
+    console.log("No arguments provided. Usage: bun run index.ts --arg1 val1");
+}

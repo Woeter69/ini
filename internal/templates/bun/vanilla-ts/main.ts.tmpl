@@ -1,0 +1,7 @@
+const welcomeMsg: string = "Welcome to {{ .Name }}!";
+console.log(welcomeMsg);
+
+const header = document.querySelector('h1');
+if (header) {
+    header.textContent = welcomeMsg;
+}
