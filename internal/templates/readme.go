@@ -606,6 +606,23 @@ cobc -x -free -o main main.cbl
 ./main
 `+"```"+`
 `, projectName)
+	case "bun":
+		return fmt.Sprintf(`# %s
+
+A modern JavaScript/TypeScript project built with [Bun](https://bun.sh/).
+
+## Getting Started
+
+To install dependencies:
+`+"```bash"+`
+bun install
+`+"```"+`
+
+To run the project:
+`+"```bash"+`
+bun run index.ts
+`+"```"+`
+`, projectName)
 	default:
 		return fmt.Sprintf("# %s\n\nA new project.\n", projectName)
 	}

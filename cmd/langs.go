@@ -435,4 +435,17 @@ Examples:
   ini cobol my-project`,
 		Placeholder: "my-app",
 	}))
+
+	rootCmd.AddCommand(makeLangCmd(langCmdConfig{
+		Use: "bun", Aliases: []string{"js", "ts", "javascript", "typescript", "node"},
+		Lang: "bun", DisplayName: "JavaScript/TypeScript",
+		Short: "Initialize a new JS/TS project (via Bun)",
+		Long: `Create a new JavaScript or TypeScript project using Bun for blazing fast execution.
+
+Examples:
+  ini js my-project
+  ini ts my-api
+  ini bun my-app`,
+		Placeholder: "my-app",
+	}))
 }
