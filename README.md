@@ -89,4 +89,4 @@ go run main.go [lang] [name]
 ---
 
 ## 📄 License
-MIT License. Built with ❤️ by **Woeter69** and **Antigravity**.
+MIT License. Built with ❤️ by **Woeter**.
