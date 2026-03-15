@@ -1,0 +1,28 @@
+using System;
+using System.Windows;
+
+namespace [[ .Name ]]
+{
+    public class App : Application
+    {
+        [STAThread]
+        public static void Main()
+        {
+            var app = new App();
+            var window = new Window
+            {
+                Title = "[[ .Name ]] Desktop App",
+                Width = 400,
+                Height = 300,
+                Content = new System.Windows.Controls.TextBlock 
+                { 
+                    Text = "Welcome to [[ .Name ]]",
+                    FontSize = 20,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }
+            };
+            app.Run(window);
+        }
+    }
+}

@@ -1,0 +1,13 @@
+-- [[ .Name ]] Web Server
+-- Suggestion: use pegasus.lua
+local Pegasus = require('pegasus')
+
+local server = Pegasus:new({
+  port = 9090,
+  location = '.'
+})
+
+server:start(function(request, response)
+  print('Request received: ' .. request:path())
+  response:status(200):add_header('Content-Type', 'text/html'):write('<h1>Hello from [[ .Name ]]!</h1>')
+end)

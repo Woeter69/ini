@@ -1,0 +1,11 @@
+import os, strutils
+
+proc main() =
+  let args = commandLineParams()
+  if args.len == 0:
+    echo "Usage: ./[[ .Name ]] <name>"
+    return
+
+  echo "Hello, ", args[0], "! This is [[ .Name ]] CLI tool."
+
+main()

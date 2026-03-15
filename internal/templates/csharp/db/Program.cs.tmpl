@@ -1,0 +1,36 @@
+using System;
+using Microsoft.EntityFrameworkCore;
+
+namespace [[ .Name ]]
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class AppDbContext : DbContext
+    {
+        public DbSet<User> Users => Set<User>();
+
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+            => options.UseSqlite("Data Source=app.db");
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            using var db = new AppDbContext();
+            db.Database.EnsureCreated();
+
+            Console.WriteLine("Inserting a new user...");
+            db.Add(new User { Name = "User from [[ .Name ]]" });
+            db.SaveChanges();
+
+            Console.WriteLine("Querying for a user...");
+            var user = db.Users.First();
+            Console.WriteLine($"User found: {user.Name}");
+        }
+    }
+}

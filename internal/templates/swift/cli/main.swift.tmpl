@@ -1,0 +1,11 @@
+import ArgumentParser
+
+@main
+struct [[ .Name ]]: ParsableCommand {
+    @Argument(help: "The name to greet.")
+    var name: String
+
+    mutating func run() throws {
+        print("Hello, \(name)! from [[ .Name ]]")
+    }
+}

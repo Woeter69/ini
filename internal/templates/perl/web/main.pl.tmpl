@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use Mojolicious::Lite;
+
+# [[ .Name ]] Web App
+get '/' => {text => 'Hello from [[ .Name ]] Perl Web API!'};
+
+app->start;

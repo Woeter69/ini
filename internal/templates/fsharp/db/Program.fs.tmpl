@@ -1,0 +1,18 @@
+open System
+open Microsoft.Data.Sqlite
+
+[<EntryPoint>]
+let main argv =
+    use connection = new SqliteConnection("Data Source=:memory:")
+    connection.Open()
+    
+    let command = connection.CreateCommand()
+    command.CommandText <- "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)"
+    command.ExecuteNonQuery() |> ignore
+    
+    let insert = connection.CreateCommand()
+    insert.CommandText <- "INSERT INTO users (name) VALUES ('User from [[ .Name ]]')"
+    insert.ExecuteNonQuery() |> ignore
+    
+    printfn "User inserted into DB for [[ .Name ]]"
+    0

@@ -1,0 +1,18 @@
+const std = @import("std");
+const net = std.net;
+
+pub fn main() !void {
+    const address = try net.Address.parseIp("127.0.0.1", 8080);
+    var server = try address.listen(.{ .reuse_address = true });
+    defer server.deinit();
+
+    std.debug.print("Zig Web Server listening on port 8080...\n", .{});
+
+    while (true) {
+        const connection = try server.accept();
+        defer connection.stream.close();
+
+        const response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\n\r\nHello from Zig!";
+        _ = try connection.stream.write(response);
+    }
+}

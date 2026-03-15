@@ -1,0 +1,15 @@
+import Vapor
+
+@main
+struct [[ .Name ]] {
+    static func main() async throws {
+        let app = try await Application.make()
+        defer { app.shutdown() }
+
+        app.get { req in
+            "Hello from [[ .Name ]] Swift Server!"
+        }
+
+        try await app.execute()
+    }
+}

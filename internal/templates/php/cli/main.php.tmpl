@@ -1,0 +1,9 @@
+<?php
+
+declare(strict_types=1);
+
+// [[ .Name ]] CLI
+$options = getopt("n:", ["name:"]);
+$name = $options['n'] ?? $options['name'] ?? "World";
+
+echo "Hello, {$name}! from [[ .Name ]]" . PHP_EOL;

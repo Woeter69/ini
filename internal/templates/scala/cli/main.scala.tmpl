@@ -1,0 +1,10 @@
+//> using scala 3
+//> using lib "com.lihaoyi::os-lib:0.9.1"
+
+@main def run(args: String*): Unit =
+  println(s"Hello from [[ .Name ]] CLI!")
+  if args.nonEmpty then
+    println(s"Arguments provided: ${args.mkString(", ")}")
+    println(s"Current directory: ${os.pwd}")
+  else
+    println("No arguments provided. Usage: ./[[ .Name ]] <args>")

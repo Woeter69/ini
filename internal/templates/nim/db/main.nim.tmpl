@@ -1,0 +1,13 @@
+import db_sqlite
+
+proc main() =
+  let db = open("test.db", "", "", "")
+  db.exec(sql"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)")
+  db.exec(sql"INSERT INTO users (name) VALUES (?)", "User from [[ .Name ]]")
+  
+  for row in db.fastRows(sql"SELECT * FROM users"):
+    echo "User: ", row[1]
+    
+  db.close()
+
+main()

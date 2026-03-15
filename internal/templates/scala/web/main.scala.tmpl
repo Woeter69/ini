@@ -1,0 +1,9 @@
+//> using scala 3
+//> using lib "com.lihaoyi::cask:0.9.1"
+
+object MinimalRoutes extends cask.MainRoutes:
+  @cask.get("/")
+  def hello() = "Hello from [[ .Name ]] Scala Web API!"
+
+  initialize()
+  println("Scala Web Server listening on port 8080...")

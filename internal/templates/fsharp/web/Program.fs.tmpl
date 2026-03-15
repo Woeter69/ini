@@ -1,0 +1,11 @@
+open System
+open Microsoft.AspNetCore.Builder
+open Microsoft.Extensions.Hosting
+open Microsoft.AspNetCore.Http
+
+let builder = WebApplication.CreateBuilder()
+let app = builder.Build()
+
+app.MapGet("/", Func<string>(fun () -> "Hello from [[ .Name ]] F# Web API!")) |> ignore
+
+app.Run()

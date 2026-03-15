@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use DBI;
+
+# [[ .Name ]] Database App
+my $dsn = "DBI:SQLite:dbname=test.db";
+my $dbh = DBI->connect($dsn, "", "", { RaiseError => 1 }) or die $DBI::errstr;
+
+print "Connected to database for [[ .Name ]]\n";
+
+$dbh->do("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)");
+$dbh->do("INSERT INTO users (name) VALUES (?)", undef, "User from [[ .Name ]]");
+
+print "User inserted into DB.\n";

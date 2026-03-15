@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+Gem::Specification.new do |spec|
+  spec.name          = "[[ .Name ]]"
+  spec.version       = "0.1.0"
+  spec.authors       = ["ini"]
+  spec.summary       = "A summary for [[ .Name ]]"
+  spec.files         = Dir["lib/**/*", "exe/*", "README.md", "LICENSE.txt"]
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = ["lib"]
+end

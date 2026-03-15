@@ -1,0 +1,9 @@
+-- [[ .Name ]] CLI
+local args = {...}
+
+if #args == 0 then
+    print("Usage: lua main.lua <name>")
+    os.exit(1)
+end
+
+print("Hello, " .. args[1] .. "! from [[ .Name ]]")

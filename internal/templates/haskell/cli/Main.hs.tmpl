@@ -1,0 +1,14 @@
+module Main where
+
+import Options.Applicative
+
+data Sample = Sample { hello :: String }
+
+sample :: Parser Sample
+sample = Sample <$> strOption (long "hello" <> metavar "TARGET" <> help "Target for greeting")
+
+main :: IO ()
+main = greet =<< execParser opts
+  where
+    opts = info (sample <**> helper) (fullDesc <> progDesc "[[ .Name ]] CLI")
+    greet (Sample h) = putStrLn $ "Hello, " ++ h ++ " from [[ .Name ]]"
