@@ -22,7 +22,7 @@ func (c *CrystalHandler) Name() string { return "Crystal" }
 
 // SupportedTypes declares which global taxonomy categories Crystal supports
 func (c *CrystalHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "cli", "data"}
+	return []string{"basic", "app", "web", "api", "cli", "data"}
 }
 
 func (c *CrystalHandler) Validate() error {
@@ -50,8 +50,11 @@ func (c *CrystalHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
 		typeDir = "basic"
+	}
+	if typeDir == "api" {
+		typeDir = "web"
 	}
 	shardTmplPath := fmt.Sprintf("crystal/%s/shard.yml.tmpl", typeDir)
 	mainTmplPath := fmt.Sprintf("crystal/%s/src/project.cr.tmpl", typeDir)

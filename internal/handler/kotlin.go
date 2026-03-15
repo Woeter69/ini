@@ -22,7 +22,7 @@ func (k *KotlinHandler) Name() string { return "Kotlin" }
 
 // SupportedTypes declares which global taxonomy categories Kotlin supports
 func (k *KotlinHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "db", "desktop", "ai"}
+	return []string{"basic", "app", "web", "api", "cli", "data", "desktop", "ai"}
 }
 
 func (k *KotlinHandler) Validate() error {
@@ -56,8 +56,14 @@ func (k *KotlinHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
 		typeDir = "basic"
+	}
+	if typeDir == "api" {
+		typeDir = "web"
+	}
+	if typeDir == "db" {
+		typeDir = "data"
 	}
 	appTmplPath := fmt.Sprintf("kotlin/%s/App.kt.tmpl", typeDir)
 	buildTmplPath := fmt.Sprintf("kotlin/%s/build.gradle.kts.tmpl", typeDir)

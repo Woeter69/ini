@@ -9,6 +9,7 @@ type Category struct {
 // Any language can choose to support any slice of these.
 var Categories = []Category{
 	{"basic", "Basic / Standard Application"},
+	{"app", "Full Application Structure"},
 	{"web", "Web & Internet"},
 	{"api", "API & Web Services"},
 	{"mobile", "Mobile"},
@@ -34,6 +35,8 @@ var Categories = []Category{
 	{"edu", "Education & Productivity"},
 	{"business", "Business & Enterprise"},
 	{"cli", "Command Line Interface (CLI)"},
+	{"math", "Mathematics & Simulation"},
+	{"stats", "Statistics & Analysis"},
 }
 
 // Aliases maps synonym IDs to canonical IDs.
@@ -42,6 +45,9 @@ var Aliases = map[string]string{
 	"storage":     "data",
 	"iot":         "embedded",
 	"interactive": "cli",
+	"stat":        "stats",
+	"mac":         "desktop",
+	"ios":         "mobile",
 }
 
 // Canonical returns the canonical ID for a given ID (resolving aliases).

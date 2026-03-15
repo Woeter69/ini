@@ -26,7 +26,7 @@ func (s *ShellHandler) Name() string {
 
 // SupportedTypes declares which global taxonomy categories Shell supports
 func (s *ShellHandler) SupportedTypes() []string {
-	return []string{"basic", "devops", "network", "os", "security", "script"}
+	return []string{"basic", "app", "cli", "devops", "network", "os", "security", "script", "embedded"}
 }
 
 func (s *ShellHandler) Validate() error {
@@ -44,8 +44,11 @@ func (s *ShellHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
 		typeDir = "basic"
+	}
+	if typeDir == "embedded" {
+		typeDir = "os"
 	}
 	mainTmplPath := fmt.Sprintf("shell/%s/main.sh.tmpl", typeDir)
 	utilsTmplPath := "shell/lib/utils.sh.tmpl"

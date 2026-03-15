@@ -27,7 +27,7 @@ func (z *ZigHandler) Name() string {
 
 // SupportedTypes declares which global taxonomy categories Zig supports
 func (z *ZigHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "embedded", "web", "game"}
+	return []string{"basic", "app", "cli", "embedded", "web", "game", "data", "math"}
 }
 
 func (z *ZigHandler) Validate() error {
@@ -57,7 +57,7 @@ func (z *ZigHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	mainTmplPath := fmt.Sprintf("zig/%s/main.zig.tmpl", typeDir)

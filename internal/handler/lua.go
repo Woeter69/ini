@@ -21,7 +21,7 @@ func (l *LuaHandler) Name() string { return "Lua" }
 
 // SupportedTypes declares which global taxonomy categories Lua supports
 func (l *LuaHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "game", "web"}
+	return []string{"basic", "app", "cli", "game", "web"}
 }
 
 func (l *LuaHandler) Validate() error { return nil }
@@ -34,7 +34,7 @@ func (l *LuaHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	mainTmplPath := fmt.Sprintf("lua/%s/main.lua.tmpl", typeDir)

@@ -28,8 +28,8 @@ func (g *GoHandler) Name() string {
 // SupportedTypes declares which global taxonomy categories Go supports
 func (g *GoHandler) SupportedTypes() []string {
 	return []string{
-		"basic", "web", "devops", "network", "os", "db", "security",
-		"monitor", "stream", "comm", "web3", "lang", "script",
+		"basic", "app", "cli", "web", "api", "devops", "network", "os", "data", "security",
+		"monitor", "stream", "comm", "web3", "lang", "script", "embedded", "math", "stats",
 	}
 }
 
@@ -68,7 +68,7 @@ func (g *GoHandler) Init(config ProjectConfig) error {
 	// Determine dependencies
 	var deps []string
 	switch config.Type {
-	case "db":
+	case "db", "data":
 		deps = append(deps, "github.com/mattn/go-sqlite3")
 	case "devops":
 		deps = append(deps, "github.com/docker/docker/client")
@@ -76,6 +76,12 @@ func (g *GoHandler) Init(config ProjectConfig) error {
 		deps = append(deps, "github.com/prometheus/client_golang/prometheus", "github.com/prometheus/client_golang/prometheus/promauto")
 	case "web3":
 		deps = append(deps, "github.com/ethereum/go-ethereum/ethclient")
+	case "api":
+		// use web template
+	case "cli":
+		deps = append(deps, "github.com/spf13/cobra")
+	case "math", "stats":
+		deps = append(deps, "gonum.org/v1/gonum/mat")
 	}
 
 	// 3. Add dependencies if any

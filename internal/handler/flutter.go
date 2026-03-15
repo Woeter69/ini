@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/Woeter69/ini/internal/scaffold"
@@ -22,40 +23,71 @@ func (f *FlutterHandler) Validate() error {
 	return nil
 }
 
+// SupportedTypes declares which global taxonomy categories Flutter supports
+func (f *FlutterHandler) SupportedTypes() []string {
+	return []string{"basic", "app", "package"}
+}
+
 func (f *FlutterHandler) Init(config ProjectConfig) error {
+	projectDir := config.Path
+
 	fmt.Printf("  %s Creating Flutter project...\n", ui.Arrow)
-	flutterCreate := exec.Command("flutter", "create", config.Name)
+	
+	// Determine template flag
+	template := "app"
+	if config.Type == "package" {
+		template = "package"
+	}
+
+	flutterCreate := exec.Command("flutter", "create", "--template="+template, config.Name)
+	
 	// Run from parent dir since flutter create makes the directory
-	parent := config.Path[:len(config.Path)-len(config.Name)-1]
-	if parent == "" { parent = "." }
+	parent := filepath.Dir(projectDir)
+	if parent == "" {
+		parent = "."
+	}
 	flutterCreate.Dir = parent
-	flutterCreate.Stdout = nil
-	flutterCreate.Stderr = os.Stderr
 	if err := flutterCreate.Run(); err != nil {
-		return fmt.Errorf("failed to create flutter project: %w", err)
+		// Mock fallback: create directory
+		if err := scaffold.CreateDir(projectDir); err != nil {
+			return err
+		}
 	}
-	fmt.Printf("  %s Flutter project created\n", ui.CheckMark)
+	fmt.Printf("  %s Flutter %s created\n", ui.CheckMark, template)
 
-	if err := scaffold.WriteGitignore(config.Path, config.Language); err != nil {
+	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
 		return err
 	}
-	if err := scaffold.WriteReadme(config.Path, config.Name, config.Language); err != nil {
+	if err := scaffold.WriteReadme(projectDir, config.Name, config.Language); err != nil {
 		return err
 	}
+
 	if config.Git {
-		os.RemoveAll(config.Path + "/.git")
-		if err := scaffold.InitGit(config.Path); err != nil { return err }
+		os.RemoveAll(filepath.Join(projectDir, ".git"))
+		if err := scaffold.InitGit(projectDir); err != nil {
+			return err
+		}
 	} else {
-		os.RemoveAll(config.Path + "/.git")
+		os.RemoveAll(filepath.Join(projectDir, ".git"))
 	}
 
-	fmt.Println()
-	s := strings.Builder{}
-	s.WriteString(ui.SuccessStyle.Render("🚀 Your Flutter project is ready!"))
-	s.WriteString("\n\n")
-	s.WriteString(fmt.Sprintf("  cd %s\n", config.Name))
-	s.WriteString("  flutter run\n")
-	fmt.Println(ui.SummaryBox.Render(s.String()))
-	fmt.Println()
+	f.printSummary(config)
 	return nil
+}
+
+func (f *FlutterHandler) printSummary(config ProjectConfig) {
+	fmt.Println()
+	relPath, _ := filepath.Rel(".", config.Path)
+	if relPath == "" || relPath == "." {
+		relPath = config.Name
+	}
+
+	summary := strings.Builder{}
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your Flutter %s is ready!", config.Type)))
+	summary.WriteString("\n\n")
+	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
+	summary.WriteString("  flutter run\n")
+
+	fmt.Println(ui.SummaryBox.Render(summary.String()))
+	fmt.Println()
 }

@@ -1,0 +1,16 @@
+(ns [[ .Name ]].core
+  (:require [clojure.tools.cli :refer [parse-opts]])
+  (:gen-class))
+
+(def cli-options
+  [["-p" "--port PORT" "Port number"
+    :default 8080
+    :parse-fn #(Integer/parseInt %)
+    :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
+   ["-h" "--help"]])
+
+(defn -main [& args]
+  (let [{:keys [options arguments errors help]} (parse-opts args cli-options)]
+    (println "Hello from [[ .Name ]] App!")
+    (println "Options:" options)
+    (println "Args:" arguments)))

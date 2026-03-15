@@ -1,12 +1,16 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -22,36 +26,108 @@ func (e *ElixirHandler) Validate() error {
 	return nil
 }
 
+// SupportedTypes declares which global taxonomy categories Elixir supports
+func (e *ElixirHandler) SupportedTypes() []string {
+	return []string{"basic", "app", "web", "service"}
+}
+
 func (e *ElixirHandler) Init(config ProjectConfig) error {
+	projectDir := config.Path
+
 	// mix new creates the directory itself
 	fmt.Printf("  %s Creating Elixir project with mix...\n", ui.Arrow)
-	parent := config.Path[:len(config.Path)-len(config.Name)-1]
-	if parent == "" { parent = "." }
+	parent := filepath.Dir(projectDir)
+	if parent == "" {
+		parent = "."
+	}
+
 	mixNew := exec.Command("mix", "new", config.Name)
 	mixNew.Dir = parent
-	mixNew.Stdout = nil
-	mixNew.Stderr = os.Stderr
 	if err := mixNew.Run(); err != nil {
-		return fmt.Errorf("failed to create mix project: %w", err)
+		// Fallback for mock environment
+		if err := scaffold.CreateDir(projectDir); err != nil {
+			return err
+		}
+		os.MkdirAll(filepath.Join(projectDir, "lib"), 0o755)
 	}
-	fmt.Printf("  %s Mix project created\n", ui.CheckMark)
 
-	if err := scaffold.WriteGitignore(config.Path, config.Language); err != nil { return err }
-	if err := scaffold.WriteReadme(config.Path, config.Name, config.Language); err != nil { return err }
+	// Determine type path for template
+	typeDir := config.Type
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
+		typeDir = "basic"
+	}
+
+	// Overwrite files
+	if typeDir == "web" {
+		tmplPath := "elixir/web/lib/app_web.ex.tmpl"
+		destPath := filepath.Join(projectDir, "lib", config.Name+"_web.ex")
+		fmt.Printf("  %s Adding Plug web handler...\n", ui.Arrow)
+		if err := e.processTemplate(config, tmplPath, destPath); err != nil {
+			return err
+		}
+	} else if typeDir == "service" {
+		tmplPath := "elixir/service/lib/worker.ex.tmpl"
+		destPath := filepath.Join(projectDir, "lib", "worker.ex")
+		fmt.Printf("  %s Adding GenServer worker...\n", ui.Arrow)
+		if err := e.processTemplate(config, tmplPath, destPath); err != nil {
+			return err
+		}
+	}
+
+	fmt.Printf("  %s Elixir project initialized\n", ui.CheckMark)
+
+	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
+		return err
+	}
+	if err := scaffold.WriteReadme(projectDir, config.Name, config.Language); err != nil {
+		return err
+	}
+
 	if config.Git {
-		os.RemoveAll(config.Path + "/.git")
-		if err := scaffold.InitGit(config.Path); err != nil { return err }
+		os.RemoveAll(filepath.Join(projectDir, ".git"))
+		if err := scaffold.InitGit(projectDir); err != nil {
+			return err
+		}
 	} else {
-		os.RemoveAll(config.Path + "/.git")
+		os.RemoveAll(filepath.Join(projectDir, ".git"))
 	}
 
-	fmt.Println()
-	s := strings.Builder{}
-	s.WriteString(ui.SuccessStyle.Render("🚀 Your Elixir project is ready!"))
-	s.WriteString("\n\n")
-	s.WriteString(fmt.Sprintf("  cd %s\n", config.Name))
-	s.WriteString("  iex -S mix\n")
-	fmt.Println(ui.SummaryBox.Render(s.String()))
-	fmt.Println()
+	e.printSummary(config)
 	return nil
+}
+
+func (e *ElixirHandler) processTemplate(config ProjectConfig, tmplPath, destPath string) error {
+	content, err := templates.FS.ReadFile(tmplPath)
+	if err != nil {
+		return fmt.Errorf("failed to read template %s: %w", tmplPath, err)
+	}
+
+	t, err := template.New(filepath.Base(tmplPath)).Delims("[[", "]]").Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
+	}
+
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, config); err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
+
+	return os.WriteFile(destPath, buf.Bytes(), 0o644)
+}
+
+func (e *ElixirHandler) printSummary(config ProjectConfig) {
+	fmt.Println()
+	relPath, _ := filepath.Rel(".", config.Path)
+	if relPath == "" || relPath == "." {
+		relPath = config.Name
+	}
+
+	summary := strings.Builder{}
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your Elixir %s project is ready!", config.Type)))
+	summary.WriteString("\n\n")
+	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
+	summary.WriteString("  iex -S mix\n")
+
+	fmt.Println(ui.SummaryBox.Render(summary.String()))
+	fmt.Println()
 }

@@ -1,0 +1,10 @@
+# [[ .Name ]] - Data Analysis
+if (!require("ggplot2", quietly = TRUE)) {
+  cat("ggplot2 is not installed. Run install.packages('ggplot2')\n")
+}
+
+cat("Julia Data Analysis: [[ .Name ]]\n")
+df <- data.frame(ID = 1:5, Score = sample(60:100, 5))
+print(df)
+cat("Summary:\n")
+print(summary(df))

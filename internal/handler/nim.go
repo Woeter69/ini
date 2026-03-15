@@ -22,7 +22,7 @@ func (n *NimHandler) Name() string { return "Nim" }
 
 // SupportedTypes declares which global taxonomy categories Nim supports
 func (n *NimHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "web", "db", "game"}
+	return []string{"basic", "app", "api", "cli", "web", "data", "game", "embedded", "math"}
 }
 
 func (n *NimHandler) Validate() error {
@@ -48,8 +48,11 @@ func (n *NimHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "api" {
 		typeDir = "basic"
+	}
+	if typeDir == "db" {
+		typeDir = "data"
 	}
 	mainTmplPath := fmt.Sprintf("nim/%s/main.nim.tmpl", typeDir)
 	nimbleTmplPath := fmt.Sprintf("nim/%s/project.nimble.tmpl", typeDir)

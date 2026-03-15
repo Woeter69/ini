@@ -22,7 +22,7 @@ func (j *JavaHandler) Name() string { return "Java" }
 
 // SupportedTypes declares which global taxonomy categories Java supports
 func (j *JavaHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "db", "desktop", "ai"}
+	return []string{"basic", "app", "web", "api", "cli", "data", "desktop", "ai", "business"}
 }
 
 func (j *JavaHandler) Validate() error {
@@ -56,8 +56,14 @@ func (j *JavaHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" || typeDir == "business" {
 		typeDir = "basic"
+	}
+	if typeDir == "api" {
+		typeDir = "web"
+	}
+	if typeDir == "db" {
+		typeDir = "data"
 	}
 	appTmplPath := fmt.Sprintf("java/%s/App.java.tmpl", typeDir)
 	buildTmplPath := fmt.Sprintf("java/%s/build.gradle.tmpl", typeDir)

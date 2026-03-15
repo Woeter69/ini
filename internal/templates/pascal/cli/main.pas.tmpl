@@ -1,0 +1,13 @@
+program [[ .Name ]];
+
+uses sysutils;
+
+var
+  i: integer;
+
+begin
+  writeln('[[ .Name ]] CLI interface');
+  writeln('Arguments count: ', ParamCount);
+  for i := 1 to ParamCount do
+    writeln('Arg ', i, ': ', ParamStr(i));
+end.

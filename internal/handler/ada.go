@@ -21,7 +21,7 @@ func (a *AdaHandler) Name() string { return "Ada" }
 
 // SupportedTypes declares which global taxonomy categories Ada supports
 func (a *AdaHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "embedded", "os"}
+	return []string{"basic", "app", "cli", "embedded", "os"}
 }
 
 func (a *AdaHandler) Validate() error { return nil }
@@ -37,7 +37,7 @@ func (a *AdaHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	gprTmplPath := "ada/basic/project.gpr.tmpl" // Shared GPR

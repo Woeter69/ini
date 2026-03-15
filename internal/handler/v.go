@@ -22,7 +22,7 @@ func (v *VHandler) Name() string { return "V" }
 
 // SupportedTypes declares which global taxonomy categories V supports
 func (v *VHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "cli", "game"}
+	return []string{"basic", "app", "web", "api", "cli", "game", "data"}
 }
 
 func (v *VHandler) Validate() error {
@@ -49,8 +49,11 @@ func (v *VHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
 		typeDir = "basic"
+	}
+	if typeDir == "api" {
+		typeDir = "web"
 	}
 	modTmplPath := "v/basic/v.mod.tmpl" // Shared v.mod
 	mainTmplPath := fmt.Sprintf("v/%s/main.v.tmpl", typeDir)

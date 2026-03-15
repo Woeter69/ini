@@ -21,7 +21,7 @@ func (c *CobolHandler) Name() string { return "COBOL" }
 
 // SupportedTypes declares which global taxonomy categories COBOL supports
 func (c *CobolHandler) SupportedTypes() []string {
-	return []string{"basic", "business", "db", "interactive"}
+	return []string{"basic", "app", "cli", "business", "data", "interactive"}
 }
 
 func (c *CobolHandler) Validate() error { return nil }
@@ -34,8 +34,11 @@ func (c *CobolHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
+	}
+	if typeDir == "cli" {
+		typeDir = "interactive"
 	}
 	mainTmplPath := fmt.Sprintf("cobol/%s/main.cbl.tmpl", typeDir)
 	makefileTmplPath := "cobol/basic/Makefile.tmpl" // Shared Makefile

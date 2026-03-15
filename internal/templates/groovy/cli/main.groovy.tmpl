@@ -1,0 +1,14 @@
+import groovy.cli.picocli.CliBuilder
+
+def cli = new CliBuilder(usage: '[[ .Name ]] [options]')
+cli.h(longOpt: 'help', 'Show usage information')
+cli.n(longOpt: 'name', args: 1, 'Name to greet')
+
+def options = cli.parse(args)
+if (!options || options.h) {
+    cli.usage()
+    return
+}
+
+def name = options.n ?: 'World'
+println "Hello, \${name}! This is [[ .Name ]] CLI."

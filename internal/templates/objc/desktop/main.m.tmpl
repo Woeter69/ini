@@ -1,0 +1,12 @@
+#import <Cocoa/Cocoa.h>
+
+int main(int argc, const char * argv[]) {
+    @autoreleasepool {
+        NSApplication *app = [NSApplication sharedApplication];
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"Hello from <<.Name>>!"];
+        [alert setInformativeText:@"This is a Cocoa app scaffolded by INI."];
+        [alert runModal];
+    }
+    return 0;
+}

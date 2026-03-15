@@ -22,7 +22,7 @@ func (d *DHandler) Name() string { return "D" }
 
 // SupportedTypes declares which global taxonomy categories D supports
 func (d *DHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "web", "game"}
+	return []string{"basic", "app", "cli", "web", "api", "game", "data"}
 }
 
 func (d *DHandler) Validate() error {
@@ -49,8 +49,11 @@ func (d *DHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
-		typeDir = "basic"
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
+		typeDir = "basic" // Dub handles both via basic structure
+	}
+	if typeDir == "api" {
+		typeDir = "web"
 	}
 	dubTmplPath := fmt.Sprintf("d/%s/dub.json.tmpl", typeDir)
 	appTmplPath := fmt.Sprintf("d/%s/source/app.d.tmpl", typeDir)

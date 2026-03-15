@@ -1,0 +1,16 @@
+open Cmdliner
+
+let hello name = print_endline ("Hello, " ^ name ^ "!")
+
+let lb_name =
+  let doc = "The name to say hello to." in
+  Arg.(value & pos 0 string "World" & info [] ~docv:"NAME" ~doc)
+
+let hello_t = Term.(const hello $ lb_name)
+
+let cmd =
+  let doc = "A basic OCaml CLI scaffolded by INI" in
+  let info = Cmd.info "[[.Name]]" ~doc in
+  Cmd.v info hello_t
+
+let () = exit (Cmd.eval cmd)

@@ -26,7 +26,7 @@ func (c *CHandler) Name() string {
 
 // SupportedTypes declares which global taxonomy categories C supports
 func (c *CHandler) SupportedTypes() []string {
-	return []string{"basic", "embedded", "os", "cli", "network"}
+	return []string{"basic", "app", "cli", "embedded", "os", "network", "data", "math"}
 }
 
 func (c *CHandler) Validate() error {
@@ -47,7 +47,7 @@ func (c *CHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	mainTmplPath := fmt.Sprintf("c/%s/main.c.tmpl", typeDir)

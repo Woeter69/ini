@@ -28,9 +28,9 @@ func (p *PythonHandler) Name() string {
 // SupportedTypes declares which global taxonomy categories Python supports
 func (p *PythonHandler) SupportedTypes() []string {
 	return []string{
-		"basic", "web", "desktop", "mobile", "game", "ai", "data", "db", "devops",
+		"basic", "app", "cli", "web", "api", "desktop", "mobile", "game", "ai", "data", "math", "stats", "devops",
 		"network", "security", "os", "lang", "finance", "comm", "script", "monitor",
-		"stream", "science", "media", "iot", "web3", "graphics", "edu",
+		"stream", "science", "media", "embedded", "web3", "graphics", "edu",
 	}
 }
 
@@ -83,9 +83,6 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 	case "data":
 		templatePath = "python/data/main.py.tmpl"
 		deps = append(deps, "pandas", "numpy")
-	case "db":
-		templatePath = "python/db/main.py.tmpl"
-		deps = append(deps, "sqlalchemy")
 	case "devops":
 		templatePath = "python/devops/main.py.tmpl"
 		deps = append(deps, "boto3")
@@ -119,17 +116,25 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 	case "media":
 		templatePath = "python/media/main.py.tmpl"
 		deps = append(deps, "pillow")
-	case "iot":
+	case "api":
+		templatePath = "python/web/main.py.tmpl" // Fallback to web for now
+		deps = append(deps, "fastapi", "uvicorn")
+	case "cli":
+		templatePath = "python/script/main.py.tmpl"
+		deps = append(deps, "typer")
+	case "math":
+		templatePath = "python/science/main.py.tmpl"
+		deps = append(deps, "numpy", "scipy")
+	case "stats":
+		templatePath = "python/science/main.py.tmpl"
+		deps = append(deps, "pandas", "statsmodels")
+	case "app":
+		templatePath = "python/basic/main.py.tmpl"
+	case "db":
+		templatePath = "python/data/main.py.tmpl"
+		deps = append(deps, "sqlalchemy")
+	case "iot", "embedded":
 		templatePath = "python/iot/main.py.tmpl"
-		// random/time built-in
-	case "web3":
-		templatePath = "python/web3/main.py.tmpl"
-		deps = append(deps, "web3")
-	case "graphics":
-		templatePath = "python/graphics/main.py.tmpl"
-		deps = append(deps, "PyOpenGL", "glfw")
-	case "edu":
-		templatePath = "python/edu/main.py.tmpl"
 	case "script", "basic":
 		templatePath = "python/script/main.py.tmpl"
 	}

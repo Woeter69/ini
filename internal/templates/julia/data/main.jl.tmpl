@@ -1,0 +1,11 @@
+# [[ .Name ]] - Data Analysis
+using DataFrames
+
+function analyze()
+    println("Julia Data Analysis: [[ .Name ]]")
+    df = DataFrame(ID = 1:3, Value = ["A", "B", "C"])
+    println("Sample DataFrame:")
+    display(df)
+end
+
+analyze()

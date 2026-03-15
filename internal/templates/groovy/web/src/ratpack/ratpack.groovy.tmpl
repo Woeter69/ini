@@ -1,0 +1,12 @@
+import static ratpack.groovy.Groovy.ratpack
+
+ratpack {
+    handlers {
+        get {
+            render "Hello from [[ .Name ]] (Ratpack Web Server)!"
+        }
+        get(":name") {
+            render "Hello \${pathTokens.name}, welcome to [[ .Name ]]!"
+        }
+    }
+}

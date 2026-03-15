@@ -21,7 +21,7 @@ func (p *PerlHandler) Name() string { return "Perl" }
 
 // SupportedTypes declares which global taxonomy categories Perl supports
 func (p *PerlHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "web", "db"}
+	return []string{"basic", "app", "cli", "web", "data"}
 }
 
 func (p *PerlHandler) Validate() error { return nil }
@@ -34,8 +34,11 @@ func (p *PerlHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
+	}
+	if typeDir == "data" {
+		typeDir = "db"
 	}
 	mainTmplPath := fmt.Sprintf("perl/%s/main.pl.tmpl", typeDir)
 	cpanfileTmplPath := fmt.Sprintf("perl/%s/cpanfile.tmpl", typeDir)

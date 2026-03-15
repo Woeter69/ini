@@ -364,6 +364,28 @@ Thumbs.db
 pubspec.lock
 `,
 
+	"dart": `# Dart
+.dart_tool/
+.packages
+build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pub
+.pub-cache/
+.pub/
+pubspec.lock
+`,
+
 	"swift": `# Build
 .build/
 .swiftpm/

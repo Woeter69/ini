@@ -41,15 +41,26 @@ Examples:
 	}))
 
 	rootCmd.AddCommand(makeLangCmd(langCmdConfig{
-		Use: "flutter", Aliases: []string{"dart"},
+		Use: "flutter", Aliases: []string{"fl"},
 		Lang: "flutter", DisplayName: "Flutter",
 		Short: "Initialize a new Flutter project",
 		Long: `Create a new Flutter project using flutter create.
 
 Examples:
   ini flutter my-project
-  ini dart my-app
   ini flutter --git my-project`,
+		Placeholder: "my-app",
+	}))
+
+	rootCmd.AddCommand(makeLangCmd(langCmdConfig{
+		Use: "dart", Aliases: []string{"dr"},
+		Lang: "dart", DisplayName: "Dart",
+		Short: "Initialize a new Dart project",
+		Long: `Create a new Dart project using dart create.
+
+Examples:
+  ini dart my-project
+  ini dart --git my-project`,
 		Placeholder: "my-app",
 	}))
 

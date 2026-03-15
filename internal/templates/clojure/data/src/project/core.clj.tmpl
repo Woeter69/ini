@@ -1,0 +1,11 @@
+(ns [[ .Name ]].core
+  (:require [next.jdbc :as jdbc]))
+
+(def db-spec {:dbtype "sqlite" :dbname "[[ .Name ]].db"})
+
+(defn -main [& args]
+  (let [ds (jdbc/get-datasource db-spec)]
+    (println "Connected to SQLite database [[ .Name ]].db")
+    (jdbc/execute! ds ["CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, val TEXT)"])
+    (jdbc/execute! ds ["INSERT INTO data (val) VALUES (?)" "Sample Entry from Clojure"])
+    (println "Inserted a sample record.")))

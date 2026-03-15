@@ -28,8 +28,8 @@ func (r *RustHandler) Name() string {
 // SupportedTypes declares which global taxonomy categories Rust supports
 func (r *RustHandler) SupportedTypes() []string {
 	return []string{
-		"basic", "web", "script", "game", "network", "os", "db",
-		"security", "graphics", "web3", "lang",
+		"basic", "app", "cli", "web", "api", "script", "game", "network", "os", "data",
+		"security", "graphics", "web3", "lang", "embedded", "math", "stats",
 	}
 }
 
@@ -80,21 +80,22 @@ func (r *RustHandler) Init(config ProjectConfig) error {
 	case "os":
 		templatePath = "rust/os/main.rs.tmpl"
 		deps = append(deps, "sysinfo")
-	case "db":
+	case "api":
+		templatePath = "rust/web/main.rs.tmpl"
+		deps = append(deps, "axum", "tokio@1", "serde")
+	case "cli":
+		templatePath = "rust/script/main.rs.tmpl"
+		deps = append(deps, "clap@4")
+	case "embedded":
+		templatePath = "rust/os/main.rs.tmpl"
+	case "math", "stats":
+		templatePath = "rust/basic/main.rs.tmpl"
+		deps = append(deps, "ndarray")
+	case "app":
+		templatePath = "rust/basic/main.rs.tmpl"
+	case "db", "data":
 		templatePath = "rust/db/main.rs.tmpl"
 		deps = append(deps, "rusqlite@0.31", "rusqlite-features=bundled")
-	case "security":
-		templatePath = "rust/security/main.rs.tmpl"
-		deps = append(deps, "sha2", "rand")
-	case "graphics":
-		templatePath = "rust/graphics/main.rs.tmpl"
-		deps = append(deps, "winit")
-	case "web3":
-		templatePath = "rust/web3/main.rs.tmpl"
-		deps = append(deps, "ethers", "tokio@1", "tokio-features=macros,rt-multi-thread")
-	case "lang":
-		templatePath = "rust/lang/main.rs.tmpl"
-		deps = append(deps, "syn", "quote")
 	case "basic":
 		templatePath = "rust/basic/main.rs.tmpl"
 	}

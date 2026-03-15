@@ -27,7 +27,7 @@ func (f *FortranHandler) Name() string {
 
 // SupportedTypes declares which global taxonomy categories Fortran supports
 func (f *FortranHandler) SupportedTypes() []string {
-	return []string{"basic", "data", "math", "cli"}
+	return []string{"basic", "app", "cli", "data", "math", "stats"}
 }
 
 func (f *FortranHandler) Validate() error {
@@ -58,7 +58,7 @@ func (f *FortranHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	tomlTmplPath := fmt.Sprintf("fortran/%s/fpm.toml.tmpl", typeDir)

@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -15,53 +18,92 @@ func init() { Register("pascal", &PascalHandler{}) }
 type PascalHandler struct{}
 
 func (p *PascalHandler) Name() string { return "Pascal" }
+
+// SupportedTypes declares which global taxonomy categories Pascal supports
+func (p *PascalHandler) SupportedTypes() []string {
+	return []string{"basic", "app", "cli", "desktop"}
+}
+
 func (p *PascalHandler) Validate() error { return nil }
 
 func (p *PascalHandler) Init(config ProjectConfig) error {
-	if err := scaffold.CreateDir(config.Path); err != nil {
+	projectDir := config.Path
+	if err := scaffold.CreateDir(projectDir); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	fmt.Printf("  %s Creating main.pas...\n", ui.Arrow)
+	// Determine type path for template
+	typeDir := config.Type
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
+		typeDir = "basic"
+	}
 
-	mainPas := fmt.Sprintf(`program %s;
+	fmt.Printf("  %s Generating main.pas...\n", ui.Arrow)
+	tmplPath := fmt.Sprintf("pascal/%s/main.pas.tmpl", typeDir)
+	if err := p.processTemplate(config, tmplPath, filepath.Join(projectDir, "main.pas")); err != nil {
+		return err
+	}
 
-begin
-  writeln('Hello from %s!');
-end.
-`, config.Name, config.Name)
-	// Replace non-alphanumeric chars for program name (Pascal gets strict about program identifiers)
-	safeProgramName := strings.Map(func(r rune) rune {
+	fmt.Printf("  %s Pascal project initialized\n", ui.CheckMark)
+
+	if err := scaffold.WriteGitignore(projectDir, config.Language); err != nil {
+		return err
+	}
+	if err := scaffold.WriteReadme(projectDir, config.Name, config.Language); err != nil {
+		return err
+	}
+
+	if config.Git {
+		if err := scaffold.InitGit(projectDir); err != nil {
+			return err
+		}
+	}
+
+	p.printSummary(config)
+	return nil
+}
+
+func (p *PascalHandler) processTemplate(config ProjectConfig, tmplPath, destPath string) error {
+	content, err := templates.FS.ReadFile(tmplPath)
+	if err != nil {
+		return fmt.Errorf("failed to read template %s: %w", tmplPath, err)
+	}
+
+	// Sanitize project name for Pascal identifier (no hyphens)
+	config.Name = strings.Map(func(r rune) rune {
 		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
 			return r
 		}
 		return '_'
 	}, config.Name)
-	
-	mainPas = fmt.Sprintf(`program %s;
 
-begin
-  writeln('Hello from %s!');
-end.
-`, safeProgramName, config.Name)
-
-	if err := os.WriteFile(filepath.Join(config.Path, "main.pas"), []byte(mainPas), 0o644); err != nil {
-		return err
+	t, err := template.New(filepath.Base(tmplPath)).Delims("[[", "]]").Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
 	}
-	fmt.Printf("  %s main.pas created\n", ui.CheckMark)
 
-	if err := scaffold.WriteGitignore(config.Path, config.Language); err != nil { return err }
-	if err := scaffold.WriteReadme(config.Path, config.Name, config.Language); err != nil { return err }
-	if config.Git { if err := scaffold.InitGit(config.Path); err != nil { return err } }
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, config); err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
 
+	return os.WriteFile(destPath, buf.Bytes(), 0o644)
+}
+
+func (p *PascalHandler) printSummary(config ProjectConfig) {
 	fmt.Println()
-	s := strings.Builder{}
-	s.WriteString(ui.SuccessStyle.Render("🚀 Your Pascal project is ready!"))
-	s.WriteString("\n\n")
-	s.WriteString(fmt.Sprintf("  cd %s\n", config.Name))
-	s.WriteString("  fpc main.pas\n")
-	s.WriteString("  ./main\n")
-	fmt.Println(ui.SummaryBox.Render(s.String()))
+	relPath, _ := filepath.Rel(".", config.Path)
+	if relPath == "" || relPath == "." {
+		relPath = config.Name
+	}
+
+	summary := strings.Builder{}
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your Pascal %s project is ready!", config.Type)))
+	summary.WriteString("\n\n")
+	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
+	summary.WriteString("  fpc main.pas\n")
+	summary.WriteString("  ./main\n")
+
+	fmt.Println(ui.SummaryBox.Render(summary.String()))
 	fmt.Println()
-	return nil
 }

@@ -21,7 +21,7 @@ type BunHandler struct{}
 func (b *BunHandler) Name() string { return "JavaScript/TypeScript (Bun)" }
 
 func (b *BunHandler) SupportedTypes() []string {
-	return []string{"basic", "web", "script", "os", "network", "db"}
+	return []string{"basic", "app", "web", "api", "cli", "os", "network", "data"}
 }
 
 func (b *BunHandler) Validate() error {
@@ -44,7 +44,12 @@ func (b *BunHandler) Init(config ProjectConfig) error {
 
 	// Handle other custom templates
 	if config.Type != "basic" && config.Type != "" {
-		templateDir := filepath.Join("bun", config.Type)
+		typeDir := config.Type
+		if typeDir == "cli" { typeDir = "script" }
+		if typeDir == "data" { typeDir = "db" }
+		if typeDir == "app" || typeDir == "api" { typeDir = "web" } // fallback
+
+		templateDir := filepath.Join("bun", typeDir)
 		if _, err := templates.FS.ReadDir(templateDir); err == nil {
 			return b.scaffoldTemplate(config, templateDir)
 		}

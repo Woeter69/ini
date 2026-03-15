@@ -22,7 +22,7 @@ func (p *PHPHandler) Name() string { return "PHP" }
 
 // SupportedTypes declares which global taxonomy categories PHP supports
 func (p *PHPHandler) SupportedTypes() []string {
-	return []string{"basic", "cli", "web", "api"}
+	return []string{"basic", "app", "cli", "web", "api"}
 }
 
 func (p *PHPHandler) Validate() error {
@@ -43,7 +43,7 @@ func (p *PHPHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" {
+	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
 		typeDir = "basic"
 	}
 	mainTmplPath := fmt.Sprintf("php/%s/main.php.tmpl", typeDir)
