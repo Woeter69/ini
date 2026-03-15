@@ -1,0 +1,19 @@
+import os
+import flag
+
+fn main() {
+	mut fp := flag.new_flag_parser(os.args)
+	fp.application('[[ .Name ]]')
+	fp.version('v0.0.1')
+	fp.description('[[ .Name ]] - CLI Tool')
+	fp.skip_executable()
+
+	name := fp.string('name', `n`, 'World', 'Name to greet')
+	fp.finalize() or {
+		println(err)
+		println(fp.usage())
+		return
+	}
+
+	println('Hello, \${name}! This is [[ .Name ]] CLI.')
+}

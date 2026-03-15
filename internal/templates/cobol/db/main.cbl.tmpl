@@ -1,0 +1,21 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. [[ .Name ]].
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT USERS-FILE ASSIGN TO "users.dat"
+           ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  USERS-FILE.
+       01  USER-RECORD.
+           05 USER-NAME      PIC X(20).
+
+       PROCEDURE DIVISION.
+           OPEN OUTPUT USERS-FILE.
+           MOVE "Woeter" TO USER-NAME.
+           WRITE USER-RECORD.
+           CLOSE USERS-FILE.
+           DISPLAY "Record written to users.dat for [[ .Name ]]".
+           STOP RUN.

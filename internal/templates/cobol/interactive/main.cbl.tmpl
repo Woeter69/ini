@@ -1,0 +1,13 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. [[ .Name ]].
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-USER-INPUT     PIC X(20).
+
+       PROCEDURE DIVISION.
+           DISPLAY "Welcome to [[ .Name ]]!".
+           DISPLAY "Please enter your name: " WITH NO ADVANCING.
+           ACCEPT WS-USER-INPUT.
+           DISPLAY "Hello, " WS-USER-INPUT "!".
+           STOP RUN.

@@ -1,0 +1,10 @@
+require "db"
+require "sqlite3"
+
+# [[ .Name ]] DB App
+DB.open "sqlite3:./test.db" do |db|
+  db.exec "CREATE TABLE IF NOT EXISTS users (name TEXT)"
+  db.exec "INSERT INTO users VALUES (?)", "User from [[ .Name ]]"
+  
+  puts "Connected and inserted a record into SQLite for [[ .Name ]]"
+end

@@ -1,0 +1,12 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. [[ .Name ]].
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  WS-AMOUNT         PIC Z,ZZ9.99 VALUE 1234.56.
+       01  WS-TITLE          PIC X(30) VALUE "[[ .Name ]] REPORT".
+
+       PROCEDURE DIVISION.
+           DISPLAY WS-TITLE.
+           DISPLAY "Account Balance: " WS-AMOUNT.
+           STOP RUN.

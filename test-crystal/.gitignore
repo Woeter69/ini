@@ -1,0 +1,15 @@
+# Build
+lib/
+bin/
+.shards/
+*.dwarf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db

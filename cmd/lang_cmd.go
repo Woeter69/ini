@@ -59,14 +59,16 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 
 			// If typeFlag was passed manually, validate it
 			if typeFlag != "" {
+				typeFlag = taxonomy.Canonical(typeFlag)
+
 				if !taxonomy.IsValid(typeFlag) {
 					fmt.Fprintln(os.Stderr, ui.ErrorStyle.Render("Error:"), fmt.Sprintf("invalid project type %q.", typeFlag))
 					os.Exit(1)
 				}
-				
+
 				supports := false
 				for _, st := range supported {
-					if st == typeFlag {
+					if taxonomy.Canonical(st) == typeFlag {
 						supports = true
 						break
 					}

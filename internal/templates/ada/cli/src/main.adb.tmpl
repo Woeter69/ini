@@ -1,0 +1,12 @@
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Command_Line; use Ada.Command_Line;
+
+procedure Main is
+begin
+   Put_Line ("[[ .Name ]] CLI Tool");
+   Put_Line ("Arguments count:" & Integer'Image (Argument_Count));
+   
+   for I in 1 .. Argument_Count loop
+      Put_Line ("Argument" & Integer'Image (I) & ": " & Argument (I));
+   end loop;
+end Main;

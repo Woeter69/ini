@@ -1,0 +1,11 @@
+# Makefile for [[ .Name ]]
+COBC = cobc
+FLAGS = -x -free
+
+all: main
+
+main: main.cbl
+	$(COBC) $(FLAGS) -o main main.cbl
+
+clean:
+	rm -f main

@@ -1,0 +1,14 @@
+require "option_parser"
+
+name = "World"
+
+OptionParser.parse do |parser|
+  parser.banner = "Usage: [[ .Name ]] [arguments]"
+  parser.on("-n NAME", "--name=NAME", "Specifies the name") { |n| name = n }
+  parser.on("-h", "--help", "Show this help") do
+    puts parser
+    exit
+  end
+end
+
+puts "Hello, #{name}! This is [[ .Name ]] CLI."

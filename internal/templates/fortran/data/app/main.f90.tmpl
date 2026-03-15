@@ -1,0 +1,15 @@
+program main
+  implicit none
+  real :: x(10), y(10)
+  integer :: i
+
+  print *, "[[ .Name ]] - Science Simulation"
+  
+  ! Initialize arrays
+  do i = 1, 10
+     x(i) = real(i)
+     y(i) = x(i)**2
+  end do
+
+  print *, "Computed squares: ", y
+end program main

@@ -1,0 +1,13 @@
+program main
+  implicit none
+  character(len=256) :: arg
+  integer :: i
+
+  print *, "[[ .Name ]] - CLI Tool"
+  
+  do i = 1, command_argument_count()
+     call get_command_argument(i, arg)
+     print *, "Argument", i, ": ", trim(arg)
+  end do
+
+end program main

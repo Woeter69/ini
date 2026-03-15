@@ -1,0 +1,7 @@
+{
+	"name": "test-d",
+	"description": "test-d - D CLI project",
+	"dependencies": {
+		"vibe-d:utils": "*"
+	}
+}
