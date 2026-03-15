@@ -1,0 +1,18 @@
+console.log("Welcome to [[ .Name ]] - Bun OS & Low-level");
+
+console.log("Platform:", process.platform);
+console.log("Architecture:", process.arch);
+console.log("Bun version:", Bun.version);
+console.log("V8 version:", process.versions.v8);
+console.log("Process ID:", process.pid);
+console.log("Uptime:", process.uptime(), "seconds");
+
+// Get memory usage
+const mem = process.memoryUsage();
+console.log("Memory usage (heapTotal):", (mem.heapTotal / 1024 / 1024).toFixed(2), "MB");
+
+// Read a file using Bun flags
+const file = Bun.file("package.json");
+if (await file.exists()) {
+  console.log("package.json size:", file.size, "bytes");
+}

@@ -130,18 +130,24 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 				}
 			}
 
-			// Special case for JS/TS Web Frameworks - Multi-stage Picker
+			// 3. Variant (JS vs TS) - Detect from alias first
 			isJS := cfg.Lang == "bun" || cfg.Lang == "js" || cfg.Lang == "ts" || cfg.Lang == "node"
-			var category string
-			if isJS && typeFlag == "web" && frameworkFlag == "" {
-				// 1. Language Variant
+			if isJS && variantFlag == "" {
+				called := cmd.CalledAs()
+				if called == "js" || called == "javascript" {
+					variantFlag = "js"
+				} else if called == "ts" || called == "typescript" {
+					variantFlag = "ts"
+				}
+
+				// If still empty and in interactive mode, ask
 				if variantFlag == "" {
 					langGrp := huh.NewGroup(
 						huh.NewSelect[string]().
-							Title("Choose Language").
+							Title("Choose Language Variant").
 							Options(
-								huh.NewOption("TypeScript (TSX)", "ts"),
-								huh.NewOption("JavaScript (JSX)", "js"),
+								huh.NewOption("TypeScript (TSX/TS)", "ts"),
+								huh.NewOption("JavaScript (JSX/JS)", "js"),
 							).
 							Value(&variantFlag),
 					)
@@ -150,6 +156,12 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 						os.Exit(1)
 					}
 				}
+			}
+
+			// Special case for JS/TS Web Frameworks - Multi-stage Picker
+			var category string
+			if isJS && typeFlag == "web" && frameworkFlag == "" {
+				// 1. Language Variant (Already handled above for JS/TS generally)
 
 				// 2. Category
 				catGrp := huh.NewGroup(

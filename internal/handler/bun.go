@@ -250,12 +250,27 @@ func (b *BunHandler) printSummary(config ProjectConfig) error {
 }
 
 func (b *BunHandler) processFile(config ProjectConfig, srcPath, destRelPath string) error {
+	// Skip files based on variant if they are code files
+	// e.g. if variant is "js", skip ".ts" files, and vice-versa.
+	// We only apply this to the final destination extension (after stripping .tmpl)
+	targetName := strings.TrimSuffix(destRelPath, ".tmpl")
+	ext := filepath.Ext(targetName)
+
+	if config.Variant != "" {
+		if config.Variant == "js" && (ext == ".ts" || ext == ".tsx") {
+			return nil
+		}
+		if config.Variant == "ts" && (ext == ".js" || ext == ".jsx") {
+			// Skip .js/.jsx in TS projects, UNLESS it's a specific requirement (next.config.js etc.)
+			// For our utility templates (index.js), we certainly want to skip.
+			return nil
+		}
+	}
+
 	content, err := templates.FS.ReadFile(srcPath)
 	if err != nil {
 		return err
 	}
-
-	targetName := strings.TrimSuffix(destRelPath, ".tmpl")
 
 	// Execute template if it has .tmpl extension (either in source or dest)
 	if strings.HasSuffix(srcPath, ".tmpl") || strings.HasSuffix(destRelPath, ".tmpl") {

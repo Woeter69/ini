@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -19,6 +22,11 @@ type ShellHandler struct{}
 
 func (s *ShellHandler) Name() string {
 	return "Shell"
+}
+
+// SupportedTypes declares which global taxonomy categories Shell supports
+func (s *ShellHandler) SupportedTypes() []string {
+	return []string{"basic", "devops", "network", "os", "security", "script"}
 }
 
 func (s *ShellHandler) Validate() error {
@@ -34,47 +42,26 @@ func (s *ShellHandler) Init(config ProjectConfig) error {
 	}
 	os.MkdirAll(filepath.Join(projectDir, "lib"), 0o755)
 
+	// Determine type path for template
+	typeDir := config.Type
+	if typeDir == "" || typeDir == "basic" {
+		typeDir = "basic"
+	}
+	mainTmplPath := fmt.Sprintf("shell/%s/main.sh.tmpl", typeDir)
+	utilsTmplPath := "shell/lib/utils.sh.tmpl"
+
 	// 2. Create main script
 	scriptName := config.Name + ".sh"
 	fmt.Printf("  %s Creating %s...\n", ui.Arrow, scriptName)
-	mainSh := fmt.Sprintf(`#!/usr/bin/env bash
-set -euo pipefail
-
-# %s — A shell script project.
-
-main() {
-    echo "Hello from %s!"
-}
-
-main "$@"
-`, config.Name, config.Name)
-	scriptPath := filepath.Join(projectDir, scriptName)
-	if err := os.WriteFile(scriptPath, []byte(mainSh), 0o755); err != nil {
-		return fmt.Errorf("failed to create %s: %w", scriptName, err)
+	if err := s.processTemplate(config, mainTmplPath, filepath.Join(projectDir, scriptName), 0o755); err != nil {
+		return err
 	}
 	fmt.Printf("  %s %s created (executable)\n", ui.CheckMark, scriptName)
 
 	// 3. Create lib/utils.sh
 	fmt.Printf("  %s Creating lib/utils.sh...\n", ui.Arrow)
-	utilsSh := `#!/usr/bin/env bash
-# Utility functions — source this from your main script:
-#   source "$(dirname "$0")/lib/utils.sh"
-
-log_info() {
-    echo "[INFO] $*"
-}
-
-log_error() {
-    echo "[ERROR] $*" >&2
-}
-
-die() {
-    log_error "$@"
-    exit 1
-}
-`
-	if err := os.WriteFile(filepath.Join(projectDir, "lib", "utils.sh"), []byte(utilsSh), 0o755); err != nil {
-		return fmt.Errorf("failed to create lib/utils.sh: %w", err)
+	if err := s.processTemplate(config, utilsTmplPath, filepath.Join(projectDir, "lib", "utils.sh"), 0o755); err != nil {
+		return err
 	}
 	fmt.Printf("  %s lib/utils.sh created\n", ui.CheckMark)
 
@@ -103,7 +90,7 @@ die() {
 	}
 
 	summary := strings.Builder{}
-	summary.WriteString(ui.SuccessStyle.Render("🚀 Your Shell project is ready!"))
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your Shell %s project is ready!", config.Type)))
 	summary.WriteString("\n\n")
 	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
 	summary.WriteString(fmt.Sprintf("  ./%s.sh\n", config.Name))
@@ -111,5 +98,27 @@ die() {
 	fmt.Println(ui.SummaryBox.Render(summary.String()))
 	fmt.Println()
 
+	return nil
+}
+
+func (s *ShellHandler) processTemplate(config ProjectConfig, tmplPath, destPath string, perm os.FileMode) error {
+	content, err := templates.FS.ReadFile(tmplPath)
+	if err != nil {
+		return fmt.Errorf("failed to read template %s: %w", tmplPath, err)
+	}
+
+	t, err := template.New(filepath.Base(tmplPath)).Delims("[[", "]]").Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
+	}
+
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, config); err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
+
+	if err := os.WriteFile(destPath, buf.Bytes(), perm); err != nil {
+		return fmt.Errorf("failed to write %s: %w", destPath, err)
+	}
 	return nil
 }
