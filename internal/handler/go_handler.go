@@ -61,8 +61,19 @@ func (g *GoHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	templatePath := fmt.Sprintf("go/%s/main.go.tmpl", config.Type)
-	if config.Type == "" || config.Type == "basic" {
+	
+	// Canonical mappings
+	switch config.Type {
+	case "", "basic", "app", "desktop", "math", "stats":
 		templatePath = "go/basic/main.go.tmpl"
+	case "api":
+		templatePath = "go/web/main.go.tmpl"
+	case "cli":
+		templatePath = "go/script/main.go.tmpl"
+	case "data":
+		templatePath = "go/db/main.go.tmpl"
+	case "embedded":
+		templatePath = "go/os/main.go.tmpl"
 	}
 
 	// Determine dependencies
@@ -77,7 +88,7 @@ func (g *GoHandler) Init(config ProjectConfig) error {
 	case "web3":
 		deps = append(deps, "github.com/ethereum/go-ethereum/ethclient")
 	case "api":
-		// use web template
+		templatePath = "go/web/main.go.tmpl"
 	case "cli":
 		deps = append(deps, "github.com/spf13/cobra")
 	case "math", "stats":

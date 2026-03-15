@@ -34,11 +34,13 @@ func (c *CobolHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
+	switch typeDir {
+	case "", "basic", "app":
 		typeDir = "basic"
-	}
-	if typeDir == "cli" {
+	case "cli":
 		typeDir = "interactive"
+	case "data":
+		typeDir = "db"
 	}
 	mainTmplPath := fmt.Sprintf("cobol/%s/main.cbl.tmpl", typeDir)
 	makefileTmplPath := "cobol/basic/Makefile.tmpl" // Shared Makefile

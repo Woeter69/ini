@@ -49,11 +49,13 @@ func (v *VHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
+	switch typeDir {
+	case "", "basic", "app", "cli":
 		typeDir = "basic"
-	}
-	if typeDir == "api" {
+	case "api":
 		typeDir = "web"
+	case "data":
+		typeDir = "basic" // Fallback
 	}
 	modTmplPath := "v/basic/v.mod.tmpl" // Shared v.mod
 	mainTmplPath := fmt.Sprintf("v/%s/main.v.tmpl", typeDir)

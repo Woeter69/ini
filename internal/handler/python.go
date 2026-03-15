@@ -129,7 +129,7 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 		templatePath = "python/science/main.py.tmpl"
 		deps = append(deps, "pandas", "statsmodels")
 	case "app":
-		templatePath = "python/basic/main.py.tmpl"
+		templatePath = "python/script/main.py.tmpl"
 	case "db":
 		templatePath = "python/data/main.py.tmpl"
 		deps = append(deps, "sqlalchemy")

@@ -1,75 +1,63 @@
-# ⚡ ini
+# ⚡ ini v1.0.0
 
 **The Blazing Fast Universal Project Initializer**
 
-`ini` is a powerful, interactive CLI tool designed to scaffold new projects across multiple languages and domains in seconds. It combines a beautiful TUI experience with opinionated, high-quality templates to get you from zero to "Hello World" (or a full-blown API) instantly.
+`ini` is a powerful, interactive CLI tool designed to scaffold new projects across **39+ programming languages** and dozens of domains in seconds. It combines a beautiful TUI experience with opinionated, high-quality templates to get you from zero to a production-ready boilerplate instantly.
 
 ---
 
 ## 🚀 Features
 
-- **Interactive TUI**: Built with [Charm.sh](https://charm.sh) libraries (`huh`, `lipgloss`) for a premium terminal experience.
-- **Domain-Specific Scaffolding**: Intelligent categorization across domains (Web, DevOps, DB, Security, etc.) tailored per language.
-- **Multi-Language Support**:
-  - **Go**: 12+ domains with auto-dependency management.
-  - **Python**: Integrated with `uv` for lightning-fast setup.
-  - **Rust**: Native `cargo` integration with domain-specific templates.
-  - **JS/TS (Bun)**: Native framework support (React, Vue, Svelte, Solid, Next.js) using instant embedded templates.
+- **Universal Interactive Picker**: Run `ini` without arguments to browse and select from all 39+ supported languages.
+- **Dynamic TUI**: Built with [Charm.sh](https://charm.sh) libraries (`huh`, `lipgloss`) for a smooth, interactive terminal experience.
+- **Global Taxonomy**: Standardized project categories (Web, API, CLI, OS, Embedded, AI, Data, etc.) applied consistently across the tool.
+- **Mobile & Legacy Support**: First-class scaffolding for **Flutter, Dart, Objective-C**, and even low-level **Assembly** (x86_64, BIOS).
+- **Toolchain Integrated**:
+  - **Go**: Native module and dependency management.
+  - **Python**: Powererd by `uv` for lightning-fast environment setup.
+  - **Rust**: Full `cargo` integration with domain-specific templates.
+  - **JS/TS**: Next.js, React, Vue, Svelte, and Solid support via Bun.
 - **Zero Overhead**: Fully portable single binary powered by `go:embed`.
-- **Git Ready**: Automatically initializes Git and professional `.gitignore` files.
 
 ---
 
-## 🛠 Supported Languages & Domains
+## 🛠 Supported Languages (Highlights)
 
-`ini` uses a structured set of domains to provide the right boilerplate for the right job.
+`ini` supports a massive range of languages, each with specialized domains:
 
-### 🐹 Go
-Natively supports: `web`, `devops`, `network`, `os`, `db`, `security`, `monitor`, `stream`, `comm`, `web3`, `lang`, `script`.
-
-### 🐍 Python
-Natively supports: `web` (FastAPI), `scraper`, `data` (Analytics), `cli`, `basic`.
-
-### 🦀 Rust
-Natively supports: `web`, `script`, `game`, `network`, `os`, `db`, `security`, `graphics`, `web3`, `lang`.
-
-### ⚡ JavaScript / TypeScript (Bun)
-Features a hierarchical picker for Frontend/Backend:
-- **Frameworks**: React (JSX/TSX), Vue (JS/TS), Svelte (JS/TS), Solid (JS/TS), Next.js, Express.js, Vanilla.
-
----
-
-## 📦 Installation
-
-Initialize your project workspace:
-
-```bash
-go build -o ini .
-sudo mv ini /usr/local/bin/ # Optional: add to PATH
-```
+- **Modern**: `Go`, `Rust`, `Python`, `Zig`, `Swift`, `Kotlin`, `Nim`, `Bun (JS/TS)`, `Julia`.
+- **Systems/Legacy**: `C`, `C++`, `Assembly`, `COBOL`, `Fortran`, `Ada`, `Pascal`, `Objective-C`.
+- **Functional/Specialized**: `Haskell`, `Ocaml`, `Clojure`, `Erlang`, `Elixir`, `Scala`, `R`.
+- **Scripting**: `Ruby`, `Perl`, `PHP`, `Lua`, `Shell (Bash)`, `V`, `Crystal`.
 
 ---
 
 ## 🚀 Usage
 
-### Interactive Mode
-Simply run the command for your preferred language and follow the prompts:
+### Global Interactive Mode
+Simply run `ini` to open the universal language picker:
 
 ```bash
-ini go my-awesome-app
-ini python data-tool
-ini rust engine
-ini bun website
+ini
+```
+
+### Direct Scaffolding
+Quickly start a project by specifying the language and name:
+
+```bash
+ini go my-app
+ini assemble bootloader --type os
+ini python ai-tool --type ai
 ```
 
 ### Non-Interactive (Flags)
-You can scaffold projects instantly by providing the language, name, and domain flags. **A language argument is always required.**
+Scaffold projects instantly with specific categories:
 
 ```bash
-# Syntax: ini [language] [project-name] --type [domain]
-ini bun my-site --type web --framework react --variant ts
-ini go my-service --type network
-ini rust engine --type graphics
+# Syntax: ini [language] [project-name] --type [category]
+ini rust game-engine --type game
+ini bun web-app --type web --framework next --variant ts
+ini asm drive-controller --type embedded
 ```
 
 ---
@@ -78,12 +66,17 @@ ini rust engine --type graphics
 
 ### Prerequisites
 - [Go](https://go.dev/dl/) 1.21+
-- [Bun](https://bun.sh) (for JS/TS scaffolding)
-- [uv](https://github.com/astral-sh/uv) (for Python scaffolding)
+- Language-specific toolchains (e.g., `uv`, `cargo`, `nasm`, `bun`) depending on what you scaffold.
 
 ### Running Locally
 ```bash
-go run main.go [lang] [name]
+go run main.go
+```
+
+### Internal Test Suite
+We maintain an internal integration suite to verify all 39+ handlers:
+```bash
+./tests/verify_all.sh
 ```
 
 ---

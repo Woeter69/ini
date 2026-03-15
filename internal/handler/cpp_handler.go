@@ -47,7 +47,8 @@ func (c *CppHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" || typeDir == "app" {
+	switch typeDir {
+	case "", "basic", "app", "data", "math":
 		typeDir = "basic"
 	}
 	mainTmplPath := fmt.Sprintf("cpp/%s/main.cpp.tmpl", typeDir)

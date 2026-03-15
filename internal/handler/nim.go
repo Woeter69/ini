@@ -48,11 +48,15 @@ func (n *NimHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "api" {
+	switch typeDir {
+	case "", "basic", "app":
 		typeDir = "basic"
-	}
-	if typeDir == "db" {
-		typeDir = "data"
+	case "api":
+		typeDir = "web"
+	case "data":
+		typeDir = "db"
+	case "math", "embedded":
+		typeDir = "basic" // Fallback
 	}
 	mainTmplPath := fmt.Sprintf("nim/%s/main.nim.tmpl", typeDir)
 	nimbleTmplPath := fmt.Sprintf("nim/%s/project.nimble.tmpl", typeDir)

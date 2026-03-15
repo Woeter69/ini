@@ -49,11 +49,13 @@ func (d *DHandler) Init(config ProjectConfig) error {
 
 	// Determine type path for template
 	typeDir := config.Type
-	if typeDir == "" || typeDir == "basic" || typeDir == "app" || typeDir == "cli" {
-		typeDir = "basic" // Dub handles both via basic structure
-	}
-	if typeDir == "api" {
+	switch typeDir {
+	case "", "basic", "app", "cli":
+		typeDir = "basic"
+	case "api":
 		typeDir = "web"
+	case "data":
+		typeDir = "basic" // Fallback
 	}
 	dubTmplPath := fmt.Sprintf("d/%s/dub.json.tmpl", typeDir)
 	appTmplPath := fmt.Sprintf("d/%s/source/app.d.tmpl", typeDir)
