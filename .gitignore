@@ -8,3 +8,4 @@ ini
 *.dylib
 *.so
 .DS_Store
+CLAUDE.md

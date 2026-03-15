@@ -1,0 +1,18 @@
+package [[ .Name ]];
+
+import javax.swing.*;
+import java.awt.*;
+
+public class App {
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("[[ .Name ]] Desktop App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        JLabel label = new JLabel("Welcome to [[ .Name ]]", SwingConstants.CENTER);
+        label.setFont(new Font("Arial", Font.BOLD, 20));
+        frame.add(label);
+
+        frame.setVisible(true);
+    }
+}

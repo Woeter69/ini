@@ -1,0 +1,13 @@
+package [[ .Name ]];
+
+import io.javalin.Javalin;
+
+public class App {
+    public static void main(String[] args) {
+        var app = Javalin.create(/*config*/)
+            .get("/", ctx -> ctx.result("Hello from [[ .Name ]] Web API!"))
+            .start(7070);
+        
+        System.out.println("Javalin server started on http://localhost:7070");
+    }
+}

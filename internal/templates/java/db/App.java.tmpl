@@ -1,0 +1,28 @@
+package [[ .Name ]];
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class App {
+    public static void main(String[] args) {
+        String url = "jdbc:sqlite::memory:";
+
+        try (Connection conn = DriverManager.getConnection(url);
+             Statement stmt = conn.createStatement()) {
+            
+            System.out.println("Connected to in-memory SQLite database.");
+
+            stmt.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)");
+            stmt.execute("INSERT INTO users (name) VALUES ('User from [[ .Name ]]')");
+
+            ResultSet rs = stmt.executeQuery("SELECT * FROM users");
+            while (rs.next()) {
+                System.out.println("User: " + rs.getString("name"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
