@@ -1,0 +1,20 @@
+NAME = [[.Name]]
+SRC  = src/main.asm
+BUILD_DIR = build
+
+all: $(BUILD_DIR)/$(NAME)
+
+$(BUILD_DIR)/$(NAME): $(SRC) | $(BUILD_DIR)
+	nasm -f elf64 -o $(BUILD_DIR)/main.o $(SRC)
+	ld -o $(BUILD_DIR)/$(NAME) $(BUILD_DIR)/main.o
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+run: $(BUILD_DIR)/$(NAME)
+	./$(BUILD_DIR)/$(NAME)
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all run clean

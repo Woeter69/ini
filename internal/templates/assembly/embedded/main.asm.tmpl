@@ -1,0 +1,12 @@
+; [[.Name]] — Embedded Loop (Bare Metal)
+
+section .text
+    global _start
+
+_start:
+    ; Initialize hardware here...
+    
+.loop:
+    ; Do nothing but wait
+    nop
+    jmp .loop

@@ -1,0 +1,21 @@
+; [[.Name]] — x86-64 Assembly (NASM, Linux CLI)
+
+section .data
+    msg db "Hello, [[.Name]] from INI!", 10
+    msg_len equ $ - msg
+
+section .text
+    global _start
+
+_start:
+    ; write(stdout, msg, msg_len)
+    mov rax, 1          ; syscall: write
+    mov rdi, 1          ; fd: stdout
+    lea rsi, [rel msg]  ; buffer
+    mov rdx, msg_len    ; count
+    syscall
+
+    ; exit(0)
+    mov rax, 60         ; syscall: exit
+    xor rdi, rdi        ; status: 0
+    syscall
