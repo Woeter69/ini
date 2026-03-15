@@ -6,7 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const Version = "0.1.0"
+const Version = "1.0.0"
 
 var banner = `
   ___       ___
