@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Woeter69/ini/internal/scaffold"
+	"github.com/Woeter69/ini/internal/templates"
 	"github.com/Woeter69/ini/internal/ui"
 )
 
@@ -19,6 +22,11 @@ type CHandler struct{}
 
 func (c *CHandler) Name() string {
 	return "C"
+}
+
+// SupportedTypes declares which global taxonomy categories C supports
+func (c *CHandler) SupportedTypes() []string {
+	return []string{"basic", "embedded", "os", "cli", "network"}
 }
 
 func (c *CHandler) Validate() error {
@@ -37,53 +45,25 @@ func (c *CHandler) Init(config ProjectConfig) error {
 	os.MkdirAll(srcDir, 0o755)
 	os.MkdirAll(includeDir, 0o755)
 
+	// Determine type path for template
+	typeDir := config.Type
+	if typeDir == "" || typeDir == "basic" {
+		typeDir = "basic"
+	}
+	mainTmplPath := fmt.Sprintf("c/%s/main.c.tmpl", typeDir)
+	makeTmplPath := fmt.Sprintf("c/%s/Makefile.tmpl", typeDir)
+
 	// 2. Create src/main.c
 	fmt.Printf("  %s Creating src/main.c...\n", ui.Arrow)
-	mainC := fmt.Sprintf(`#include <stdio.h>
-
-int main(void) {
-    printf("Hello from %s!\n");
-    return 0;
-}
-`, config.Name)
-	if err := os.WriteFile(filepath.Join(srcDir, "main.c"), []byte(mainC), 0o644); err != nil {
-		return fmt.Errorf("failed to create main.c: %w", err)
+	if err := c.processTemplate(config, mainTmplPath, filepath.Join(srcDir, "main.c")); err != nil {
+		return err
 	}
 	fmt.Printf("  %s src/main.c created\n", ui.CheckMark)
 
 	// 3. Create Makefile
 	fmt.Printf("  %s Creating Makefile...\n", ui.Arrow)
-	makefile := fmt.Sprintf(`CC        = gcc
-CFLAGS    = -Wall -Wextra -std=c17 -O2
-INCLUDES  = -Iinclude
-SRC_DIR   = src
-BUILD_DIR = build
-NAME      = %s
-
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-OBJS = $(SRCS:$(SRC_DIR)/%%.c=$(BUILD_DIR)/%%.o)
-
-all: $(BUILD_DIR)/$(NAME)
-
-$(BUILD_DIR)/$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
-
-$(BUILD_DIR)/%%.o: $(SRC_DIR)/%%.c | $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
-
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
-
-run: $(BUILD_DIR)/$(NAME)
-	./$(BUILD_DIR)/$(NAME)
-
-clean:
-	rm -rf $(BUILD_DIR)
-
-.PHONY: all run clean
-`, config.Name)
-	if err := os.WriteFile(filepath.Join(projectDir, "Makefile"), []byte(makefile), 0o644); err != nil {
-		return fmt.Errorf("failed to create Makefile: %w", err)
+	if err := c.processTemplate(config, makeTmplPath, filepath.Join(projectDir, "Makefile")); err != nil {
+		return err
 	}
 	fmt.Printf("  %s Makefile created\n", ui.CheckMark)
 
@@ -112,7 +92,7 @@ clean:
 	}
 
 	summary := strings.Builder{}
-	summary.WriteString(ui.SuccessStyle.Render("🚀 Your C project is ready!"))
+	summary.WriteString(ui.SuccessStyle.Render(fmt.Sprintf("🚀 Your C %s project is ready!", config.Type)))
 	summary.WriteString("\n\n")
 	summary.WriteString(fmt.Sprintf("  cd %s\n", relPath))
 	summary.WriteString("  make && make run\n")
@@ -121,4 +101,30 @@ clean:
 	fmt.Println()
 
 	return nil
+}
+
+func (c *CHandler) processTemplate(config ProjectConfig, tmplPath, destPath string) error {
+	content, err := templates.FS.ReadFile(tmplPath)
+	if err != nil {
+		// Fallback for types that might not have a specific Makefile (use basic)
+		if strings.HasSuffix(tmplPath, "Makefile.tmpl") {
+			tmplPath = "c/basic/Makefile.tmpl"
+			content, err = templates.FS.ReadFile(tmplPath)
+		}
+		if err != nil {
+			return fmt.Errorf("failed to read template %s: %w", tmplPath, err)
+		}
+	}
+
+	t, err := template.New(filepath.Base(tmplPath)).Delims("[[", "]]").Parse(string(content))
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
+	}
+
+	var buf bytes.Buffer
+	if err := t.Execute(&buf, config); err != nil {
+		return fmt.Errorf("failed to execute template: %w", err)
+	}
+
+	return os.WriteFile(destPath, buf.Bytes(), 0o644)
 }

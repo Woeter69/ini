@@ -1,0 +1,19 @@
+#include <iostream>
+#include <unistd.h>
+#include <sys/utsname.h>
+#include <string>
+
+int main() {
+    std::cout << "OS Info for [[ .Name ]]" << std::endl;
+    
+    struct utsname info;
+    if (uname(&info) == 0) {
+        std::cout << "Sysname:  " << info.sysname << "\n"
+                  << "Release:  " << info.release << "\n"
+                  << "Version:  " << info.version << "\n"
+                  << "Machine:  " << info.machine << std::endl;
+    }
+    
+    std::cout << "PID: " << getpid() << std::endl;
+    return 0;
+}

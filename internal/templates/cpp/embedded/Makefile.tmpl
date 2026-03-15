@@ -1,0 +1,25 @@
+CXX       = arm-none-eabi-g++
+CXXFLAGS  = -Wall -Wextra -mcpu=cortex-m4 -mthumb -nostdlib -fno-exceptions -fno-rtti -O2
+INCLUDES  = -Iinclude
+SRC_DIR   = src
+BUILD_DIR = build
+NAME      = [[ .Name ]]
+
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
+
+all: $(BUILD_DIR)/$(NAME).elf
+
+$(BUILD_DIR)/$(NAME).elf: $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -o $@ $<
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all clean

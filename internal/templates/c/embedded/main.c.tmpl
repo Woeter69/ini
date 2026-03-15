@@ -1,0 +1,18 @@
+#include <stdint.h>
+
+// [[ .Name ]] — Embedded C
+// Minimal main loop for bare-metal or RTOS
+
+void system_init(void) {
+    // Hardware initialization
+}
+
+int main(void) {
+    system_init();
+    
+    while (1) {
+        // Main loop
+    }
+    
+    return 0;
+}
