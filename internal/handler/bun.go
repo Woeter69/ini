@@ -259,7 +259,7 @@ func (b *BunHandler) processFile(config ProjectConfig, srcPath, destRelPath stri
 
 	// Execute template if it has .tmpl extension (either in source or dest)
 	if strings.HasSuffix(srcPath, ".tmpl") || strings.HasSuffix(destRelPath, ".tmpl") {
-		t, err := template.New(filepath.Base(srcPath)).Parse(string(content))
+		t, err := template.New(filepath.Base(srcPath)).Delims("[[", "]]").Parse(string(content))
 		if err != nil {
 			return err
 		}
