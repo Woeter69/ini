@@ -1,4 +1,4 @@
-# ⚡ ini v1.0.0
+# ini
 
 **The Blazing Fast Universal Project Initializer**
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 Features
+## Features
 
 - **Universal Interactive Picker**: Run `ini` without arguments to browse and select from all 39+ supported languages.
 - **Dynamic TUI**: Built with [Charm.sh](https://charm.sh) libraries (`huh`, `lipgloss`) for a smooth, interactive terminal experience.
@@ -21,7 +21,7 @@
 
 ---
 
-## 🛠 Supported Languages (Highlights)
+## Supported Languages (Highlights)
 
 `ini` supports a massive range of languages, each with specialized domains:
 
@@ -32,7 +32,7 @@
 
 ---
 
-## 🚀 Usage
+## Usage
 
 ### Global Interactive Mode
 Simply run `ini` to open the universal language picker:
