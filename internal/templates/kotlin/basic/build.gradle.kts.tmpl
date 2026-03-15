@@ -1,0 +1,21 @@
+plugins {
+    kotlin("jvm") version "1.9.21"
+    application
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(kotlin("test"))
+    implementation("com.google.guava:guava:32.1.2-jre")
+}
+
+application {
+    mainClass.set("[[ .Name ]].AppKt")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
