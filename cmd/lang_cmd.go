@@ -244,7 +244,10 @@ func makeLangCmd(cfg langCmdConfig) *cobra.Command {
 
 	cmd.Flags().BoolVar(&gitFlag, "git", false, "Initialize a git repository with 'main' branch")
 	cmd.Flags().StringVarP(&typeFlag, "type", "t", "", "Type of project to scaffold (e.g. web, game, ai)")
-	cmd.Flags().StringVarP(&frameworkFlag, "framework", "f", "", "Sub-framework for JS/TS projects (e.g. react, next, express)")
-	cmd.Flags().StringVarP(&variantFlag, "variant", "v", "", "Language variant for JS/TS projects (js or ts)")
+	
+	if cfg.Lang == "bun" {
+		cmd.Flags().StringVarP(&frameworkFlag, "framework", "f", "", "Sub-framework for JS/TS projects (e.g. react, next, express)")
+		cmd.Flags().StringVarP(&variantFlag, "variant", "v", "", "Language variant for JS/TS projects (js or ts)")
+	}
 	return cmd
 }

@@ -79,7 +79,7 @@ func (p *PythonHandler) Init(config ProjectConfig) error {
 		deps = append(deps, "pygame")
 	case "ai":
 		templatePath = "python/ai/main.py.tmpl"
-		deps = append(deps, "torch")
+		// Removed torch to prevent 2GB+ silent download. User must run `uv add torch` manually.
 	case "data":
 		templatePath = "python/data/main.py.tmpl"
 		deps = append(deps, "pandas", "numpy")
